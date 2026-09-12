@@ -286,6 +286,58 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
 @keyframes sp{to{transform:rotate(360deg)}}
 
 /* ============================================================
+   8.b صور المقال + عارض التكبير + محرّر HTML
+   ============================================================ */
+.article .content img,.inline-img{max-width:100%;border-radius:var(--r);border:1px solid var(--line-2);margin:1.3rem 0}
+.article .content figure{margin:1.5rem 0}
+.article .content figcaption{color:var(--muted);font-size:.85rem;text-align:center;margin-top:.5rem}
+.article .content table{width:100%;border-collapse:collapse;margin:1.4rem 0;font-size:.95rem}
+.article .content th,.article .content td{border:1px solid var(--line-2);padding:.6rem .8rem;text-align:start}
+.article .content th{background:var(--ink-2);color:var(--gold-soft);font-weight:600}
+.article .content iframe{width:100%;aspect-ratio:16/9;border:1px solid var(--line-2);border-radius:var(--r);margin:1.3rem 0}
+.zoomable{cursor:zoom-in}
+.gal-title{font-family:"Aref Ruqaa",serif;font-size:1.35rem;margin:2.8rem 0 1rem}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.7rem}
+.gallery img{aspect-ratio:4/3;object-fit:cover;width:100%;border-radius:var(--r);border:1px solid var(--line-2);cursor:zoom-in;transition:border-color .25s,transform .35s var(--ease);margin:0}
+.gallery img:hover{border-color:var(--gold);transform:translateY(-3px)}
+
+#lightbox{position:fixed;inset:0;z-index:200;background:rgba(5,8,18,.97);display:flex;flex-direction:column;animation:fade .2s var(--ease)}
+.lb-top{display:flex;align-items:center;gap:.5rem;padding:.9rem 1.1rem;border-bottom:1px solid var(--line-2)}
+.lb-top .count{margin-inline-end:auto;color:var(--muted);font-size:.9rem}
+.lb-btn{background:transparent;border:1px solid var(--line-2);color:var(--parchment);border-radius:var(--r);padding:.35rem .75rem;cursor:pointer;font-size:.88rem;transition:.2s;line-height:1.6}
+.lb-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lb-stage{flex:1;overflow:hidden;display:grid;place-items:center;touch-action:none}
+.lb-stage img{max-width:92vw;max-height:74vh;transform-origin:center center;user-select:none;-webkit-user-drag:none;border-radius:4px}
+.lb-stage.zoomed img{cursor:grab}
+.lb-stage.grabbing img{cursor:grabbing}
+.lb-nav{display:flex;justify-content:center;gap:.6rem;padding:.8rem}
+.lb-thumbs{display:flex;gap:.45rem;justify-content:center;padding:0 1rem 1.1rem;overflow-x:auto}
+.lb-thumbs img{height:46px;width:64px;object-fit:cover;border-radius:4px;opacity:.4;cursor:pointer;border:1px solid transparent;transition:.2s;flex-shrink:0}
+.lb-thumbs img.on,.lb-thumbs img:hover{opacity:1;border-color:var(--gold)}
+
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:.6rem;margin-top:.9rem}
+.gal-item{position:relative;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;background:var(--ink)}
+.gal-item>img{aspect-ratio:4/3;object-fit:cover;width:100%}
+.gal-item .badge{position:absolute;top:5px;inset-inline-start:5px;background:var(--gold);color:var(--ink);font-size:.68rem;padding:.1rem .45rem;border-radius:3px}
+.gal-acts{display:flex;border-top:1px solid var(--line-2)}
+.gal-acts button{flex:1;background:none;border:0;border-inline-start:1px solid var(--line-2);color:var(--muted);font-size:.72rem;padding:.38rem 0;cursor:pointer;transition:.2s}
+.gal-acts button:first-child{border-inline-start:0}
+.gal-acts button:hover{background:var(--ink-3);color:var(--parchment)}
+.gal-acts button.rm:hover{color:var(--danger)}
+.url-row{display:flex;gap:.5rem;margin-top:.8rem}
+.url-row input{flex:1}
+.size-bar{margin-top:.7rem;font-size:.78rem;color:#6d7796}
+.size-bar.warn{color:var(--danger)}
+
+.editor-head{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;justify-content:space-between;margin-bottom:.55rem}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden}
+.seg button{background:none;border:0;color:var(--muted);padding:.38rem .85rem;cursor:pointer;font-size:.84rem;transition:.2s}
+.seg button:hover{color:var(--parchment)}
+.seg button[aria-pressed="true"]{background:var(--gold);color:var(--ink);font-weight:500}
+#f-content.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem;direction:ltr;text-align:left;min-height:230px}
+.preview-box{border:1px solid var(--line-2);border-radius:var(--r);padding:1.3rem;margin-top:.9rem;background:var(--ink)}
+
+/* ============================================================
    9. استجابة + حركة مخفّضة
    ============================================================ */
 @media(max-width:900px){
@@ -449,19 +501,31 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
               <input id="f-excerpt" maxlength="220" placeholder="سطر أو سطران يظهران في البطاقة">
             </div>
             <div class="field">
-              <label>صورة المقال</label>
-              <div class="drop" id="drop">اسحب صورة إلى هنا أو انقر للاختيار — تُضغط تلقائيًا قبل الحفظ</div>
-              <input type="file" id="f-file" accept="image/*" class="hide">
-              <div class="field" style="margin-top:.8rem;margin-bottom:0">
+              <label>صور المقال</label>
+              <div class="drop" id="drop">اسحب الصور إلى هنا أو انقر للاختيار — يمكن اختيار عدّة صور دفعة واحدة</div>
+              <input type="file" id="f-file" accept="image/*" multiple class="hide">
+              <div class="url-row">
                 <input id="f-url" placeholder="أو الصق رابط صورة مباشر (https://…)">
-                <div class="hint">اترك الحقلين فارغين لنشر مقال بلا صورة.</div>
+                <button type="button" class="btn ghost" id="addUrl">إضافة</button>
               </div>
-              <div id="preview"></div>
+              <div class="hint">الصورة الأولى تصبح غلاف المقال. لوضع صورة داخل النص اضغط «إدراج» أسفلها.</div>
+              <div class="gal" id="gal"></div>
+              <div class="size-bar" id="galSize"></div>
             </div>
             <div class="field">
-              <label for="f-content">نصّ المقال</label>
-              <textarea id="f-content" required placeholder="اكتب هنا…&#10;&#10;## عنوان فرعي&#10;فقرة عادية، ويمكن **تعريض** كلمة.&#10;- نقطة في قائمة&#10;&gt; اقتباس"></textarea>
-              <div class="hint">تنسيق مبسّط: ‎## عنوان، ‎### عنوان أصغر، ‎**عريض**، ‎- قائمة، ‎&gt; اقتباس، ‎[نص](رابط)</div>
+              <div class="editor-head">
+                <label for="f-content" style="margin:0">نصّ المقال</label>
+                <div style="display:flex;gap:.5rem;align-items:center">
+                  <div class="seg" id="fmtSeg">
+                    <button type="button" data-fmt="md" aria-pressed="true">تنسيق مبسّط</button>
+                    <button type="button" data-fmt="html" aria-pressed="false">HTML</button>
+                  </div>
+                  <button type="button" class="btn ghost" id="togglePreview">معاينة</button>
+                </div>
+              </div>
+              <textarea id="f-content" required placeholder="اكتب هنا…"></textarea>
+              <div class="hint" id="fmtHint"></div>
+              <div class="preview-box hide" id="previewBox"><div class="article"><div class="content" id="previewOut"></div></div></div>
             </div>
             <div style="display:flex;gap:.7rem">
               <button type="submit" class="btn solid" id="saveBtn">نشر المقال</button>
@@ -513,6 +577,23 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
       <button class="btn ghost" id="confirmNo">تراجع</button>
     </div>
   </div>
+</div>
+
+<!-- ============ عارض الصور ============ -->
+<div id="lightbox" class="hide" role="dialog" aria-modal="true" aria-label="عارض الصور">
+  <div class="lb-top">
+    <span class="count" id="lbCount"></span>
+    <button class="lb-btn" id="lbOut" title="تصغير">−</button>
+    <button class="lb-btn" id="lbIn" title="تكبير">+</button>
+    <button class="lb-btn" id="lbReset">الحجم الأصلي</button>
+    <button class="lb-btn" id="lbClose">إغلاق ✕</button>
+  </div>
+  <div class="lb-stage" id="lbStage"><img id="lbImg" alt=""></div>
+  <div class="lb-nav">
+    <button class="lb-btn" id="lbPrev">السابق</button>
+    <button class="lb-btn" id="lbNext">التالي</button>
+  </div>
+  <div class="lb-thumbs" id="lbThumbs"></div>
 </div>
 
 <div id="toasts"></div>
@@ -595,6 +676,42 @@ function renderContent(text=""){
   if (list) out.push("</ul>");
   return out.join("");
 }
+/* HTML خام من المحرّر -> HTML آمن (تُحذف السكربتات والمعالجات) */
+function sanitizeHtml(html=""){
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html;
+  const banned = ["script","object","embed","base","meta","link","form","input","button"];
+  tpl.content.querySelectorAll("*").forEach(el => {
+    if (banned.includes(el.tagName.toLowerCase())){ el.remove(); return; }
+    [...el.attributes].forEach(a => {
+      const n = a.name.toLowerCase(), v = (a.value||"").trim().toLowerCase();
+      if (n.startsWith("on")) el.removeAttribute(a.name);
+      else if ((n === "href" || n === "src" || n === "srcdoc") && /^\s*javascript:/.test(v)) el.removeAttribute(a.name);
+    });
+  });
+  return tpl.innerHTML;
+}
+/* صور المقال: مصفوفة images الجديدة مع دعم الحقل القديم image */
+function articleImages(p){
+  if (Array.isArray(p.images) && p.images.length) return p.images.filter(Boolean);
+  return p.image ? [p.image] : [];
+}
+const coverOf = p => articleImages(p)[0] || "";
+/* النصّ + استبدال رموز الصور {{img1}} */
+function buildContent(p){
+  const list = articleImages(p);
+  let html = (p.format === "html") ? sanitizeHtml(p.content || "") : renderContent(p.content || "");
+  // داخل سمة مثل src="{{img1}}" -> الرابط وحده
+  html = html.replace(/(src|href|poster|data-src)\s*=\s*(["'])\{\{img(\d+)\}\}\2/gi, (m, attr, q, n) => {
+    const src = list[+n - 1];
+    return src ? `${attr}=${q}${src}${q}` : m;
+  });
+  // رمز مستقلّ داخل النص -> وسم صورة كامل
+  return html.replace(/\{\{img(\d+)\}\}/g, (m, n) => {
+    const src = list[+n - 1];
+    return src ? `<img class="inline-img zoomable" src="${src}" alt="">` : "";
+  });
+}
 function placeholder(title=""){
   const ch = escapeHtml((title||"ذ").trim().charAt(0) || "ذ");
   return "data:image/svg+xml," + encodeURIComponent(
@@ -670,7 +787,8 @@ let filterCat = "الكل";
 let searchTerm = "";
 let isAdmin = false;
 let editingId = null;
-let imageData = "";        // base64 أو رابط
+let images = [];           // صور المقال (base64 أو روابط)
+let contentFormat = "md";  // md | html
 
 /* ---------- 5. العرض العام ---------- */
 function visible(){
@@ -683,7 +801,7 @@ function visible(){
 }
 function cardHTML(p){
   return `
-    <div class="thumb"><img loading="lazy" src="${p.image || placeholder(p.title)}" alt="${escapeHtml(p.title)}"></div>
+    <div class="thumb"><img loading="lazy" src="${coverOf(p) || placeholder(p.title)}" alt="${escapeHtml(p.title)}"></div>
     <div class="meta"><span class="cat">${escapeHtml(p.category||"عام")}</span><i class="dot"></i><span>${fmtDate(p.createdAt)}</span></div>
     <h3>${escapeHtml(p.title)}</h3>
     <p>${escapeHtml(p.excerpt || (p.content||"").slice(0,130)+"…")}</p>
@@ -715,7 +833,7 @@ function renderList(){
     const el = document.createElement("article");
     el.className = "featured";
     el.innerHTML = `
-      <div class="thumb"><img src="${p.image || placeholder(p.title)}" alt="${escapeHtml(p.title)}"></div>
+      <div class="thumb"><img src="${coverOf(p) || placeholder(p.title)}" alt="${escapeHtml(p.title)}"></div>
       <div class="body">
         <div class="meta" style="margin-bottom:.9rem">
           <span class="cat">${escapeHtml(p.category||"عام")}</span><i class="dot"></i>
@@ -763,6 +881,9 @@ function showReader(id){
   const p = posts.find(x => x.id === id);
   if (!p){ $("#articleBody").innerHTML = `<div class="empty"><strong>المقال غير موجود</strong>ربما حُذف أو تغيّر رابطه.</div>`; return; }
   document.title = p.title + " — ذكاء";
+  const list = articleImages(p);
+  const used = new Set([...(p.content||"").matchAll(/\{\{img(\d+)\}\}/g)].map(m => +m[1] - 1));
+  const rest = list.map((s,i) => ({s,i})).filter(o => o.i > 0 && !used.has(o.i));
   $("#articleBody").innerHTML = `
     <div class="meta">
       <span class="cat">${escapeHtml(p.category||"عام")}</span><i class="dot"></i>
@@ -772,8 +893,11 @@ function showReader(id){
     </div>
     <h1>${escapeHtml(p.title)}</h1>
     ${p.excerpt ? `<p style="color:var(--muted);font-size:1.1rem">${escapeHtml(p.excerpt)}</p>` : ""}
-    ${p.image ? `<img class="hero-img" src="${p.image}" alt="${escapeHtml(p.title)}">` : ""}
-    <div class="content">${renderContent(p.content||"")}</div>`;
+    ${list[0] ? `<img class="hero-img zoomable" src="${list[0]}" alt="${escapeHtml(p.title)}">` : ""}
+    <div class="content">${buildContent(p)}</div>
+    ${rest.length ? `<h3 class="gal-title">صور المقال</h3>
+      <div class="gallery">${rest.map(o => `<img loading="lazy" src="${o.s}" alt="">`).join("")}</div>` : ""}`;
+  wireZoom($("#articleBody"));
 }
 function route(){
   const h = location.hash || "#/";
@@ -866,7 +990,7 @@ function compress(file, maxW = 1200, q = 0.72){
         c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
         let out = c.toDataURL("image/jpeg", q);
         let qq = q;
-        while (out.length > 850000 && qq > 0.32){ qq -= 0.1; out = c.toDataURL("image/jpeg", qq); }
+        while (out.length > 480000 && qq > 0.3){ qq -= 0.08; out = c.toDataURL("image/jpeg", qq); }
         res(out);
       };
       img.onerror = () => rej(new Error("bad image"));
@@ -876,26 +1000,195 @@ function compress(file, maxW = 1200, q = 0.72){
     fr.readAsDataURL(file);
   });
 }
-function setPreview(src){
-  imageData = src || "";
-  $("#preview").innerHTML = src
-    ? `<div class="preview"><img src="${src}" alt="معاينة"><button type="button" id="rmImg" title="إزالة">✕</button></div>` : "";
-  const rm = $("#rmImg"); if (rm) rm.onclick = () => { setPreview(""); $("#f-url").value = ""; $("#f-file").value = ""; };
+function setImages(next){
+  images = next.filter(Boolean);
+  renderGallery();
+}
+function renderGallery(){
+  const box = $("#gal"), bar = $("#galSize");
+  if (!images.length){
+    box.innerHTML = `<p class="hint" style="grid-column:1/-1;margin:0">لا صور بعد — المقال يُنشر بلا صورة إن تركتها فارغة.</p>`;
+    bar.textContent = ""; bar.classList.remove("warn");
+    return;
+  }
+  box.innerHTML = "";
+  images.forEach((src, i) => {
+    const it = document.createElement("div");
+    it.className = "gal-item";
+    it.innerHTML = `
+      <img src="${src}" alt="">
+      ${i === 0 ? '<span class="badge">الغلاف</span>' : ''}
+      <div class="gal-acts">
+        <button type="button" data-a="ins" title="إدراج الصورة في مكان المؤشّر داخل النص">إدراج</button>
+        ${i ? '<button type="button" data-a="cov" title="اجعلها الغلاف">غلاف</button>' : ''}
+        <button type="button" data-a="rm" class="rm" title="حذف الصورة">حذف</button>
+      </div>`;
+    it.querySelector('[data-a="ins"]').onclick = () => insertToken(i + 1);
+    const cov = it.querySelector('[data-a="cov"]');
+    if (cov) cov.onclick = () => { const a = [...images]; a.unshift(a.splice(i,1)[0]); setImages(a); toast("صارت صورة الغلاف", "ok"); };
+    it.querySelector('[data-a="rm"]').onclick = () => setImages(images.filter((_,k) => k !== i));
+    it.querySelector("img").onclick = () => openLB(images, i);
+    it.querySelector("img").style.cursor = "zoom-in";
+    box.appendChild(it);
+  });
+  const size = new Blob([JSON.stringify(images)]).size;
+  const heavy = size > 820000;
+  bar.textContent = `حجم الصور المرفوعة: ${size > 1048576 ? (size/1048576).toFixed(2)+" م.ب" : Math.round(size/1024)+" ك.ب"}`
+    + (heavy ? " — قريب من حدّ Firestore (١ م.ب). احذف صورة أو استعمل روابط بدل الرفع." : " · من أصل ١ م.ب لكل مقال");
+  bar.classList.toggle("warn", heavy);
+}
+function insertToken(n){
+  const ta = $("#f-content"), token = `{{img${n}}}`;
+  const s = ta.selectionStart ?? ta.value.length, e = ta.selectionEnd ?? s;
+  const wrapped = contentFormat === "html" ? token : "\n" + token + "\n";
+  ta.value = ta.value.slice(0, s) + wrapped + ta.value.slice(e);
+  ta.focus(); ta.selectionStart = ta.selectionEnd = s + wrapped.length;
+  toast(`أُدرجت ${token} في النص`, "ok");
+  if (!$("#previewBox").classList.contains("hide")) drawPreview();
 }
 const drop = $("#drop");
 drop.onclick = () => $("#f-file").click();
 drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
 drop.ondragleave = () => drop.classList.remove("over");
-drop.ondrop = async e => { e.preventDefault(); drop.classList.remove("over"); handleFile(e.dataTransfer.files[0]); };
-$("#f-file").onchange = e => handleFile(e.target.files[0]);
-async function handleFile(file){
-  if (!file || !file.type.startsWith("image/")) return toast("اختر ملف صورة صالحًا", "err");
-  drop.textContent = "جارٍ ضغط الصورة…";
-  try{ setPreview(await compress(file)); toast("جاهزة للنشر", "ok"); }
-  catch{ toast("تعذّرت قراءة الصورة", "err"); }
-  finally{ drop.textContent = "اسحب صورة إلى هنا أو انقر للاختيار — تُضغط تلقائيًا قبل الحفظ"; }
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); handleFiles(e.dataTransfer.files); };
+$("#f-file").onchange = e => { handleFiles(e.target.files); e.target.value = ""; };
+async function handleFiles(fileList){
+  const files = [...(fileList||[])].filter(f => f.type.startsWith("image/"));
+  if (!files.length) return toast("اختر ملفات صور صالحة", "err");
+  const label = drop.textContent;
+  let done = 0;
+  for (const f of files){
+    drop.textContent = `جارٍ ضغط الصور… (${++done}/${files.length})`;
+    try{ images.push(await compress(f)); }
+    catch{ toast(`تعذّرت قراءة ${f.name}`, "err"); }
+  }
+  drop.textContent = label;
+  setImages(images);
+  toast(files.length > 1 ? `أُضيفت ${files.length} صور` : "أُضيفت الصورة", "ok");
 }
-$("#f-url").oninput = e => { const v = e.target.value.trim(); if (/^https?:\/\//.test(v)) setPreview(v); };
+function addUrlImage(){
+  const v = $("#f-url").value.trim();
+  if (!/^https?:\/\//.test(v)) return toast("الصق رابطًا يبدأ بـ https://", "err");
+  setImages([...images, v]);
+  $("#f-url").value = "";
+}
+$("#addUrl").onclick = addUrlImage;
+$("#f-url").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); addUrlImage(); } });
+
+/* ---------- 9.b عارض الصور مع تكبير ---------- */
+const LB = { list: [], i: 0, s: 1, x: 0, y: 0 };
+const lb = $("#lightbox"), lbImg = $("#lbImg"), lbStage = $("#lbStage");
+function applyLB(){
+  lbImg.style.transform = `translate(${LB.x}px,${LB.y}px) scale(${LB.s})`;
+  lbStage.classList.toggle("zoomed", LB.s > 1);
+}
+function zoomAt(factor, px, py){
+  const ns = Math.min(8, Math.max(1, LB.s * factor));
+  if (ns === LB.s) return;
+  const r = lbImg.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  const dx = (px ?? cx) - cx, dy = (py ?? cy) - cy, k = ns / LB.s;
+  LB.x -= dx * (k - 1); LB.y -= dy * (k - 1); LB.s = ns;
+  if (LB.s === 1){ LB.x = 0; LB.y = 0; }
+  applyLB();
+}
+function showLB(i){
+  LB.i = (i + LB.list.length) % LB.list.length;
+  LB.s = 1; LB.x = 0; LB.y = 0;
+  lbImg.src = LB.list[LB.i]; applyLB();
+  $("#lbCount").textContent = LB.list.length > 1 ? `${LB.i + 1} / ${LB.list.length}` : "";
+  $$("#lbThumbs img").forEach((t,k) => t.classList.toggle("on", k === LB.i));
+  const many = LB.list.length > 1;
+  $("#lbPrev").classList.toggle("hide", !many);
+  $("#lbNext").classList.toggle("hide", !many);
+  $("#lbThumbs").classList.toggle("hide", !many);
+}
+function openLB(list, i = 0){
+  LB.list = (list || []).filter(Boolean);
+  if (!LB.list.length) return;
+  const th = $("#lbThumbs"); th.innerHTML = "";
+  LB.list.forEach((src, k) => { const t = new Image(); t.src = src; t.onclick = () => showLB(k); th.appendChild(t); });
+  lb.classList.remove("hide");
+  document.body.style.overflow = "hidden";
+  showLB(i);
+}
+function closeLB(){ lb.classList.add("hide"); document.body.style.overflow = ""; }
+function wireZoom(root){
+  const imgs = [...root.querySelectorAll("img")];
+  const srcs = imgs.map(im => im.getAttribute("src"));
+  imgs.forEach((im, i) => { im.classList.add("zoomable"); im.onclick = () => openLB(srcs, i); });
+}
+$("#lbClose").onclick = closeLB;
+$("#lbIn").onclick = () => zoomAt(1.35);
+$("#lbOut").onclick = () => zoomAt(1/1.35);
+$("#lbReset").onclick = () => { LB.s = 1; LB.x = 0; LB.y = 0; applyLB(); };
+$("#lbPrev").onclick = () => showLB(LB.i - 1);
+$("#lbNext").onclick = () => showLB(LB.i + 1);
+lbStage.addEventListener("click", e => { if (e.target === lbStage) closeLB(); });
+lbStage.addEventListener("wheel", e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.18 : 1/1.18, e.clientX, e.clientY); }, { passive:false });
+lbStage.addEventListener("dblclick", e => zoomAt(LB.s > 1 ? 1/LB.s : 2.5, e.clientX, e.clientY));
+const pts = new Map(); let pan = null, pinch = null;
+lbStage.addEventListener("pointerdown", e => {
+  lbStage.setPointerCapture(e.pointerId);
+  pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  if (pts.size === 1) pan = { x:e.clientX, y:e.clientY, ox:LB.x, oy:LB.y };
+  if (pts.size === 2){ pan = null; const [a,b] = [...pts.values()]; pinch = { d:Math.hypot(a.x-b.x, a.y-b.y) || 1, s:LB.s }; }
+});
+lbStage.addEventListener("pointermove", e => {
+  if (!pts.has(e.pointerId)) return;
+  pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  if (pinch && pts.size === 2){
+    const [a,b] = [...pts.values()];
+    LB.s = Math.min(8, Math.max(1, pinch.s * (Math.hypot(a.x-b.x, a.y-b.y) / pinch.d)));
+    if (LB.s === 1){ LB.x = 0; LB.y = 0; }
+    applyLB(); return;
+  }
+  if (pan && LB.s > 1){
+    LB.x = pan.ox + (e.clientX - pan.x); LB.y = pan.oy + (e.clientY - pan.y);
+    lbStage.classList.add("grabbing"); applyLB();
+  }
+});
+["pointerup","pointercancel","pointerleave"].forEach(ev => lbStage.addEventListener(ev, e => {
+  pts.delete(e.pointerId); lbStage.classList.remove("grabbing");
+  if (pts.size < 2) pinch = null;
+  if (!pts.size) pan = null;
+}));
+addEventListener("keydown", e => {
+  if (lb.classList.contains("hide")) return;
+  if (e.key === "Escape") closeLB();
+  else if (e.key === "ArrowLeft") showLB(LB.i + 1);
+  else if (e.key === "ArrowRight") showLB(LB.i - 1);
+  else if (e.key === "+" || e.key === "=") zoomAt(1.35);
+  else if (e.key === "-") zoomAt(1/1.35);
+});
+
+/* ---------- 9.c صيغة النصّ: مبسّط أو HTML ---------- */
+const HINTS = {
+  md:  "تنسيق مبسّط: ‎## عنوان، ‎### عنوان أصغر، ‎**عريض**، ‎- قائمة، ‎&gt; اقتباس، ‎[نص](رابط)، و‎{{img1}} لإدراج صورة.",
+  html:"HTML كامل: &lt;h2&gt; &lt;p&gt; &lt;ul&gt; &lt;img&gt; &lt;table&gt; &lt;iframe&gt; وسمات style الخاصة بك. تُحذف وسوم &lt;script&gt; ومعالجات on* عند العرض. استعمل ‎{{img1}} لإدراج صورة مرفوعة."
+};
+function setFormat(f){
+  contentFormat = f === "html" ? "html" : "md";
+  $$("#fmtSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.fmt === contentFormat));
+  $("#fmtHint").innerHTML = HINTS[contentFormat];
+  $("#f-content").classList.toggle("code", contentFormat === "html");
+  $("#f-content").placeholder = contentFormat === "html"
+    ? '<h2>عنوان فرعي</h2>\n<p>فقرة…</p>\n<img src="{{img1}}">'
+    : "اكتب هنا…\n\n## عنوان فرعي\nفقرة عادية، ويمكن **تعريض** كلمة.\n- نقطة في قائمة";
+  if (!$("#previewBox").classList.contains("hide")) drawPreview();
+}
+$$("#fmtSeg button").forEach(b => b.onclick = () => setFormat(b.dataset.fmt));
+function drawPreview(){
+  const out = $("#previewOut");
+  out.innerHTML = buildContent({ content: $("#f-content").value, format: contentFormat, images });
+  wireZoom(out);
+}
+$("#togglePreview").onclick = () => {
+  const box = $("#previewBox"), on = box.classList.toggle("hide");
+  $("#togglePreview").textContent = on ? "معاينة" : "إخفاء المعاينة";
+  if (!on) drawPreview();
+};
+$("#f-content").addEventListener("input", () => { if (!$("#previewBox").classList.contains("hide")) drawPreview(); });
 
 /* ---------- 10. نشر / تعديل / حذف ---------- */
 $("#postForm").onsubmit = async e => {
@@ -909,9 +1202,16 @@ $("#postForm").onsubmit = async e => {
     author:  $("#f-author").value.trim() || "فريق التحرير",
     excerpt: $("#f-excerpt").value.trim(),
     content: $("#f-content").value.trim(),
-    image:   imageData,
+    format:  contentFormat,
+    images:  [...images],
+    image:   images[0] || "",
     updatedAt: serverTimestamp()
   };
+  const weight = new Blob([JSON.stringify(data)]).size;
+  if (weight > 950000){
+    btn.disabled = false; btn.textContent = editingId ? "حفظ التعديلات" : "نشر المقال";
+    return toast("حجم المقال يتجاوز حدّ Firestore (١ م.ب). احذف صورة أو أضفها برابط بدل الرفع.", "err");
+  }
   try{
     if (editingId){
       await updateDoc(doc(db,"posts",editingId), data);
@@ -931,8 +1231,12 @@ $("#postForm").onsubmit = async e => {
   }
 };
 function resetForm(){
-  editingId = null; setPreview("");
+  editingId = null;
+  setImages([]);
   $("#postForm").reset();
+  setFormat("md");
+  $("#previewBox").classList.add("hide");
+  $("#togglePreview").textContent = "معاينة";
   $("#editorTitle").textContent = "مقال جديد";
   $("#saveBtn").textContent = "نشر المقال";
   $("#cancelEdit").classList.add("hide");
@@ -946,7 +1250,8 @@ function startEdit(p){
   $("#f-author").value = p.author || "";
   $("#f-excerpt").value = p.excerpt || "";
   $("#f-content").value = p.content || "";
-  setPreview(p.image || "");
+  setFormat(p.format === "html" ? "html" : "md");
+  setImages(articleImages(p));
   $("#editorTitle").textContent = "تعديل المقال";
   $("#saveBtn").textContent = "حفظ التعديلات";
   $("#cancelEdit").classList.remove("hide");
@@ -975,7 +1280,7 @@ function renderAdminList(){
     const row = document.createElement("div");
     row.className = "row";
     row.innerHTML = `
-      <img src="${p.image || placeholder(p.title)}" alt="">
+      <img src="${coverOf(p) || placeholder(p.title)}" alt="">
       <div class="t"><b>${escapeHtml(p.title)}</b><span>${escapeHtml(p.category||"عام")} · ${fmtDate(p.createdAt)}</span></div>
       <div class="acts">
         <button data-a="view">عرض</button>
@@ -990,6 +1295,8 @@ function renderAdminList(){
 }
 
 /* ---------- 11. تفاصيل صغيرة ---------- */
+setFormat("md");
+renderGallery();
 $("#burger").onclick = () => $("#nav").classList.toggle("closed");
 $("#year").textContent = new Date().getFullYear();
 $$(".yr").forEach(e => e.textContent = new Date().getFullYear());
