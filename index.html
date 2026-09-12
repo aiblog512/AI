@@ -334,8 +334,45 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
 .seg button{background:none;border:0;color:var(--muted);padding:.38rem .85rem;cursor:pointer;font-size:.84rem;transition:.2s}
 .seg button:hover{color:var(--parchment)}
 .seg button[aria-pressed="true"]{background:var(--gold);color:var(--ink);font-weight:500}
-#f-content.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem;direction:ltr;text-align:left;min-height:230px}
+#f-content.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem;direction:ltr;text-align:left;min-height:260px}
 .preview-box{border:1px solid var(--line-2);border-radius:var(--r);padding:1.3rem;margin-top:.9rem;background:var(--ink)}
+
+/* المحرّر المرئي */
+.rte-wrap{border:1px solid var(--line-2);border-radius:var(--r);background:var(--ink);overflow:hidden;transition:border-color .2s}
+.rte-wrap:focus-within{border-color:var(--gold)}
+.rte-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.12rem;padding:.4rem;background:var(--ink-2);border-bottom:1px solid var(--line-2);position:sticky;top:70px;z-index:5}
+.rte-bar button{background:none;border:0;color:var(--muted);min-width:30px;height:30px;border-radius:4px;cursor:pointer;font-size:.92rem;display:grid;place-items:center;transition:.15s;padding:0}
+.rte-bar button:hover{background:var(--ink-3);color:var(--parchment)}
+.rte-bar button.on{background:var(--gold);color:var(--ink)}
+.rte-bar button.wide{padding:0 .6rem;font-size:.8rem}
+.rte-bar select{background:var(--ink);border:1px solid var(--line-2);border-radius:4px;color:var(--parchment);padding:.28rem .4rem;font-size:.82rem;cursor:pointer}
+.rte-bar input[type=color]{width:30px;height:30px;padding:2px;border:1px solid var(--line-2);border-radius:4px;background:var(--ink);cursor:pointer}
+.rte-bar .sep{width:1px;height:20px;background:var(--line-2);margin:0 .3rem;flex-shrink:0}
+.rte{min-height:270px;max-height:60vh;overflow:auto;padding:1.3rem 1.4rem;outline:none;line-height:2;overflow-wrap:break-word}
+.rte.empty::before{content:attr(data-ph);color:#6d7796;pointer-events:none}
+.rte h2,.article .content h2{font-family:"Aref Ruqaa",serif}
+.rte h2{font-size:1.55rem;margin:1.6rem 0 .7rem;color:var(--gold-soft)}
+.rte h3{font-size:1.25rem;margin:1.3rem 0 .5rem;font-family:"Aref Ruqaa",serif}
+.rte p{margin:0 0 1rem}
+.rte ul,.rte ol{padding-inline-start:1.4rem;margin:0 0 1rem}
+.rte blockquote{margin:1.2rem 0;padding:.3rem 1.1rem;border-inline-start:2px solid var(--gold);color:var(--gold-soft)}
+.rte pre{background:var(--ink-2);border:1px solid var(--line-2);border-radius:4px;padding:.9rem;direction:ltr;text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:.88rem;overflow:auto}
+.rte img{max-width:100%;border-radius:var(--r);border:1px solid var(--line-2);margin:.8rem 0}
+.rte table{width:100%;border-collapse:collapse;margin:1rem 0}
+.rte th,.rte td{border:1px solid var(--line-2);padding:.5rem .7rem;text-align:start}
+.rte th{background:var(--ink-2);color:var(--gold-soft)}
+.rte a{color:var(--gold);text-decoration:underline}
+.rte hr{border:0;border-top:1px solid var(--line);margin:1.4rem 0}
+.rte iframe{width:100%;aspect-ratio:16/9;border:1px solid var(--line-2);border-radius:var(--r)}
+
+/* قائمة أوامر «/» */
+.slash{position:fixed;z-index:150;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:.35rem;width:260px;max-height:290px;overflow:auto;box-shadow:0 18px 44px rgba(0,0,0,.55)}
+.slash .item{padding:.45rem .65rem;border-radius:4px;cursor:pointer;color:var(--muted);font-size:.9rem;line-height:1.5}
+.slash .item small{display:block;font-size:.74rem;opacity:.65}
+.slash .item.on,.slash .item:hover{background:var(--ink-3);color:var(--parchment)}
+.pick-item{position:relative;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.2s}
+.pick-item:hover{border-color:var(--gold)}
+.pick-item img{aspect-ratio:4/3;object-fit:cover;width:100%}
 
 /* ============================================================
    9. استجابة + حركة مخفّضة
@@ -514,16 +551,57 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
             </div>
             <div class="field">
               <div class="editor-head">
-                <label for="f-content" style="margin:0">نصّ المقال</label>
+                <label style="margin:0">نصّ المقال</label>
                 <div style="display:flex;gap:.5rem;align-items:center">
                   <div class="seg" id="fmtSeg">
-                    <button type="button" data-fmt="md" aria-pressed="true">تنسيق مبسّط</button>
+                    <button type="button" data-fmt="rte" aria-pressed="true">محرّر</button>
                     <button type="button" data-fmt="html" aria-pressed="false">HTML</button>
                   </div>
                   <button type="button" class="btn ghost" id="togglePreview">معاينة</button>
                 </div>
               </div>
-              <textarea id="f-content" required placeholder="اكتب هنا…"></textarea>
+
+              <div class="rte-wrap" id="rteWrap">
+                <div class="rte-bar" id="rteBar">
+                  <select id="rteBlock" title="نمط الفقرة">
+                    <option value="p">عادي</option>
+                    <option value="h2">عنوان</option>
+                    <option value="h3">عنوان فرعي</option>
+                    <option value="blockquote">اقتباس</option>
+                    <option value="pre">كود</option>
+                  </select>
+                  <select id="rteSize" title="حجم الخط">
+                    <option value="2">صغير</option>
+                    <option value="3" selected>عادي</option>
+                    <option value="5">كبير</option>
+                    <option value="6">أكبر</option>
+                  </select>
+                  <span class="sep"></span>
+                  <button type="button" data-cmd="bold" title="عريض"><b>B</b></button>
+                  <button type="button" data-cmd="italic" title="مائل"><i>I</i></button>
+                  <button type="button" data-cmd="underline" title="تسطير"><u>U</u></button>
+                  <button type="button" data-cmd="strikeThrough" title="شطب"><s>S</s></button>
+                  <input type="color" id="rteColor" value="#e8b15c" title="لون النص">
+                  <span class="sep"></span>
+                  <button type="button" data-cmd="insertUnorderedList" title="قائمة نقطية">☰</button>
+                  <button type="button" data-cmd="insertOrderedList" title="قائمة مرقّمة">≡</button>
+                  <button type="button" data-cmd="justifyRight" title="محاذاة يمين">▷</button>
+                  <button type="button" data-cmd="justifyCenter" title="توسيط">◈</button>
+                  <button type="button" data-cmd="justifyLeft" title="محاذاة يسار">◁</button>
+                  <span class="sep"></span>
+                  <button type="button" data-cmd="link" class="wide" title="رابط">رابط</button>
+                  <button type="button" data-cmd="image" class="wide" title="صورة">صورة</button>
+                  <button type="button" data-cmd="table" class="wide" title="جدول">جدول</button>
+                  <button type="button" data-cmd="video" class="wide" title="فيديو يوتيوب">فيديو</button>
+                  <button type="button" data-cmd="insertHorizontalRule" title="فاصل">—</button>
+                  <span class="sep"></span>
+                  <button type="button" data-cmd="undo" title="تراجع">↺</button>
+                  <button type="button" data-cmd="redo" title="إعادة">↻</button>
+                  <button type="button" data-cmd="removeFormat" class="wide" title="إزالة التنسيق">تنظيف</button>
+                </div>
+                <div class="rte empty" id="rte" contenteditable="true" data-ph="اكتب هنا، أو اضغط / لقائمة الأوامر"></div>
+              </div>
+              <textarea id="f-content" class="hide code" spellcheck="false"></textarea>
               <div class="hint" id="fmtHint"></div>
               <div class="preview-box hide" id="previewBox"><div class="article"><div class="content" id="previewOut"></div></div></div>
             </div>
@@ -596,6 +674,21 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
   <div class="lb-thumbs" id="lbThumbs"></div>
 </div>
 
+<div id="slashMenu" class="slash hide"></div>
+
+<!-- ============ اختيار صورة للإدراج ============ -->
+<div class="overlay hide" id="imgPick">
+  <div class="modal" style="width:min(600px,100%)">
+    <h3>إدراج صورة</h3>
+    <p class="sub">اختر من صور المقال، أو ارفع صورة جديدة تُضاف إلى المعرض.</p>
+    <div class="gal" id="pickGal"></div>
+    <div class="modal-actions">
+      <button class="btn" type="button" id="pickUpload">رفع صورة جديدة</button>
+      <button class="btn ghost" type="button" id="pickClose">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <div id="toasts"></div>
 
 <!-- ============================================================
@@ -648,7 +741,7 @@ function toast(text, kind=""){
   setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .3s"; setTimeout(()=>el.remove(),300); }, 3400);
 }
 function readTime(text=""){
-  const w = text.trim().split(/\s+/).filter(Boolean).length;
+  const w = String(text).replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(w/180));
 }
 function fmtDate(ts){
@@ -788,7 +881,7 @@ let searchTerm = "";
 let isAdmin = false;
 let editingId = null;
 let images = [];           // صور المقال (base64 أو روابط)
-let contentFormat = "md";  // md | html
+
 
 /* ---------- 5. العرض العام ---------- */
 function visible(){
@@ -957,7 +1050,7 @@ onAuthStateChanged(auth, user => {
   $("#logoutBtn").classList.toggle("hide", !isAdmin);
   $("#adminLink").classList.toggle("hide", !isAdmin);
   $("#adminLink").href = "#/admin";
-  $("#adminWho").textContent = user ? `مسجَّل الدخول باسم ${user.email} · المعرّف ${user.uid}` : "";
+  $("#adminWho").textContent = user ? "مسجَّل الدخول باسم Admin" : "";
   if (!isAdmin && location.hash === "#/admin") location.hash = "#/";
   route(); renderAdminList();
 });
@@ -1023,10 +1116,22 @@ function renderGallery(){
         ${i ? '<button type="button" data-a="cov" title="اجعلها الغلاف">غلاف</button>' : ''}
         <button type="button" data-a="rm" class="rm" title="حذف الصورة">حذف</button>
       </div>`;
-    it.querySelector('[data-a="ins"]').onclick = () => insertToken(i + 1);
+    it.querySelector('[data-a="ins"]').onclick = () => insertImageAt(i);
     const cov = it.querySelector('[data-a="cov"]');
-    if (cov) cov.onclick = () => { const a = [...images]; a.unshift(a.splice(i,1)[0]); setImages(a); toast("صارت صورة الغلاف", "ok"); };
-    it.querySelector('[data-a="rm"]').onclick = () => setImages(images.filter((_,k) => k !== i));
+    if (cov) cov.onclick = () => {
+      const order = images.map((_,k) => k);
+      order.unshift(order.splice(i,1)[0]);
+      const map = {}; order.forEach((oldK,newK) => map[oldK+1] = newK+1);
+      setImages(order.map(k => images[k]));
+      remapContentImages(map);
+      toast("صارت صورة الغلاف", "ok");
+    };
+    it.querySelector('[data-a="rm"]').onclick = () => {
+      const map = {};
+      images.forEach((_,k) => { if (k !== i) map[k+1] = (k < i ? k : k-1) + 1; });
+      setImages(images.filter((_,k) => k !== i));
+      remapContentImages(map);
+    };
     it.querySelector("img").onclick = () => openLB(images, i);
     it.querySelector("img").style.cursor = "zoom-in";
     box.appendChild(it);
@@ -1036,15 +1141,6 @@ function renderGallery(){
   bar.textContent = `حجم الصور المرفوعة: ${size > 1048576 ? (size/1048576).toFixed(2)+" م.ب" : Math.round(size/1024)+" ك.ب"}`
     + (heavy ? " — قريب من حدّ Firestore (١ م.ب). احذف صورة أو استعمل روابط بدل الرفع." : " · من أصل ١ م.ب لكل مقال");
   bar.classList.toggle("warn", heavy);
-}
-function insertToken(n){
-  const ta = $("#f-content"), token = `{{img${n}}}`;
-  const s = ta.selectionStart ?? ta.value.length, e = ta.selectionEnd ?? s;
-  const wrapped = contentFormat === "html" ? token : "\n" + token + "\n";
-  ta.value = ta.value.slice(0, s) + wrapped + ta.value.slice(e);
-  ta.focus(); ta.selectionStart = ta.selectionEnd = s + wrapped.length;
-  toast(`أُدرجت ${token} في النص`, "ok");
-  if (!$("#previewBox").classList.contains("hide")) drawPreview();
 }
 const drop = $("#drop");
 drop.onclick = () => $("#f-file").click();
@@ -1162,33 +1258,263 @@ addEventListener("keydown", e => {
   else if (e.key === "-") zoomAt(1/1.35);
 });
 
-/* ---------- 9.c صيغة النصّ: مبسّط أو HTML ---------- */
-const HINTS = {
-  md:  "تنسيق مبسّط: ‎## عنوان، ‎### عنوان أصغر، ‎**عريض**، ‎- قائمة، ‎&gt; اقتباس، ‎[نص](رابط)، و‎{{img1}} لإدراج صورة.",
-  html:"HTML كامل: &lt;h2&gt; &lt;p&gt; &lt;ul&gt; &lt;img&gt; &lt;table&gt; &lt;iframe&gt; وسمات style الخاصة بك. تُحذف وسوم &lt;script&gt; ومعالجات on* عند العرض. استعمل ‎{{img1}} لإدراج صورة مرفوعة."
-};
-function setFormat(f){
-  contentFormat = f === "html" ? "html" : "md";
-  $$("#fmtSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.fmt === contentFormat));
-  $("#fmtHint").innerHTML = HINTS[contentFormat];
-  $("#f-content").classList.toggle("code", contentFormat === "html");
-  $("#f-content").placeholder = contentFormat === "html"
-    ? '<h2>عنوان فرعي</h2>\n<p>فقرة…</p>\n<img src="{{img1}}">'
-    : "اكتب هنا…\n\n## عنوان فرعي\nفقرة عادية، ويمكن **تعريض** كلمة.\n- نقطة في قائمة";
+/* ---------- 9.c المحرّر المرئي (WYSIWYG) ---------- */
+const rte = $("#rte"), srcTA = $("#f-content");
+let editorMode = "rte";           // rte | html
+let savedRange = null;
+
+/* تحويل الصور المرفوعة إلى رموز عند التخزين، والعكس عند التحرير */
+function tokenize(root){
+  const c = root.cloneNode(true);
+  c.querySelectorAll("img").forEach(im => {
+    const n = +im.dataset.img;
+    if (n) im.setAttribute("src", `{{img${n}}}`);
+    im.removeAttribute("data-img");
+    im.removeAttribute("class");
+  });
+  return c.innerHTML.trim();
+}
+function detokenize(html){
+  const t = document.createElement("div");
+  t.innerHTML = html || "";
+  t.querySelectorAll("img").forEach(im => {
+    const m = (im.getAttribute("src")||"").match(/^\{\{img(\d+)\}\}$/);
+    if (m){ im.dataset.img = m[1]; im.setAttribute("src", images[+m[1]-1] || placeholder("")); }
+  });
+  return t.innerHTML;
+}
+function currentContent(){ return editorMode === "rte" ? tokenize(rte) : srcTA.value.trim(); }
+/* عند حذف صورة أو تغيير الغلاف: تُحدَّث الصور الموضوعة داخل النص */
+function remapContentImages(map){
+  [...rte.querySelectorAll("img[data-img]")].forEach(im => {
+    const n = map[+im.dataset.img];
+    if (!n) im.remove();
+    else { im.dataset.img = n; im.setAttribute("src", images[n-1] || ""); }
+  });
+  srcTA.value = srcTA.value.replace(/\{\{img(\d+)\}\}/g, (m, n) => { const t = map[+n]; return t ? `{{img${t}}}` : ""; });
+  syncEmpty();
+}
+function setContent(html){
+  srcTA.value = html || "";
+  rte.innerHTML = detokenize(html || "");
+  syncEmpty();
+}
+function syncEmpty(){
+  const bare = rte.innerHTML.replace(/<br\s*\/?>|&nbsp;|\s/gi, "");
+  rte.classList.toggle("empty", bare === "" || bare === "<div></div>" || bare === "<p></p>");
   if (!$("#previewBox").classList.contains("hide")) drawPreview();
 }
-$$("#fmtSeg button").forEach(b => b.onclick = () => setFormat(b.dataset.fmt));
+
+/* أوامر التنسيق */
+function exec(cmd, val = null){
+  rte.focus();
+  document.execCommand(cmd, false, val);
+  syncEmpty(); refreshBar();
+}
+function insertHTML(html){
+  rte.focus();
+  if (savedRange){ const sel = getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); savedRange = null; }
+  document.execCommand("insertHTML", false, html);
+  syncEmpty();
+}
+function insertImageAt(i){
+  const src = images[i];
+  if (!src) return;
+  if (editorMode === "rte") insertHTML(`<img data-img="${i+1}" src="${src}"><p><br></p>`);
+  else insertAtCursorTA(`<img src="{{img${i+1}}}" alt="">`);
+  toast("أُدرجت الصورة في النص", "ok");
+}
+function insertAtCursorTA(text){
+  const a = srcTA.selectionStart ?? srcTA.value.length, b = srcTA.selectionEnd ?? a;
+  srcTA.value = srcTA.value.slice(0,a) + text + srcTA.value.slice(b);
+  srcTA.focus(); srcTA.selectionStart = srcTA.selectionEnd = a + text.length;
+  if (!$("#previewBox").classList.contains("hide")) drawPreview();
+}
+document.execCommand("styleWithCSS", false, true);
+
+$$("#rteBar [data-cmd]").forEach(b => {
+  b.addEventListener("mousedown", e => e.preventDefault());
+  b.onclick = () => {
+    const c = b.dataset.cmd;
+    if (c === "link"){
+      const url = prompt("رابط الوجهة:", "https://");
+      if (url) exec("createLink", url);
+    } else if (c === "image"){
+      openPicker();
+    } else if (c === "table"){
+      insertHTML(`<table><tr><th>عمود</th><th>عمود</th><th>عمود</th></tr>
+        <tr><td>—</td><td>—</td><td>—</td></tr><tr><td>—</td><td>—</td><td>—</td></tr></table><p><br></p>`);
+    } else if (c === "video"){
+      const u = prompt("رابط فيديو يوتيوب:", "https://www.youtube.com/watch?v=");
+      const id = u && (u.match(/[?&]v=([\w-]{6,})/) || u.match(/youtu\.be\/([\w-]{6,})/) || [])[1];
+      if (id) insertHTML(`<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe><p><br></p>`);
+      else if (u) toast("لم أتعرّف على رابط يوتيوب", "err");
+    } else exec(c);
+  };
+});
+$("#rteBlock").onchange = e => { exec("formatBlock", "<" + e.target.value + ">"); };
+$("#rteSize").onchange  = e => { exec("fontSize", e.target.value); };
+$("#rteColor").oninput  = e => { exec("foreColor", e.target.value); };
+
+function refreshBar(){
+  $$("#rteBar [data-cmd]").forEach(b => {
+    const c = b.dataset.cmd;
+    if (["bold","italic","underline","strikeThrough","insertUnorderedList","insertOrderedList","justifyRight","justifyCenter","justifyLeft"].includes(c)){
+      let on = false; try{ on = document.queryCommandState(c); }catch{}
+      b.classList.toggle("on", on);
+    }
+  });
+  let block = "p";
+  try{ block = (document.queryCommandValue("formatBlock") || "p").toLowerCase(); }catch{}
+  const sel = $("#rteBlock");
+  sel.value = [...sel.options].some(o => o.value === block) ? block : "p";
+}
+["keyup","mouseup","focus"].forEach(ev => rte.addEventListener(ev, refreshBar));
+rte.addEventListener("input", syncEmpty);
+rte.addEventListener("blur", () => { const s = getSelection(); if (s.rangeCount && rte.contains(s.anchorNode)) savedRange = s.getRangeAt(0).cloneRange(); });
+rte.addEventListener("click", e => { if (e.target.tagName === "IMG") openLB([e.target.getAttribute("src")], 0); });
+
+/* لصق صورة مباشرة */
+rte.addEventListener("paste", async e => {
+  const files = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith("image/"));
+  if (!files.length) return;
+  e.preventDefault();
+  for (const f of files){
+    try{
+      const data = await compress(f);
+      images.push(data); renderGallery();
+      insertHTML(`<img data-img="${images.length}" src="${data}"><p><br></p>`);
+    }catch{ toast("تعذّرت قراءة الصورة الملصوقة", "err"); }
+  }
+});
+
+/* ---------- 9.d قائمة الأوامر «/» ---------- */
+const SLASH = [
+  { k:"عنوان",        a:"h2 title",     d:"عنوان رئيسي داخل المقال", run:() => exec("formatBlock","<h2>") },
+  { k:"عنوان فرعي",   a:"h3 subtitle",  d:"عنوان أصغر",              run:() => exec("formatBlock","<h3>") },
+  { k:"نصّ عادي",     a:"p text",       d:"فقرة عادية",              run:() => exec("formatBlock","<p>") },
+  { k:"قائمة نقطية",  a:"ul list",      d:"نقاط غير مرقّمة",          run:() => exec("insertUnorderedList") },
+  { k:"قائمة مرقّمة", a:"ol number",    d:"ترقيم تلقائي",            run:() => exec("insertOrderedList") },
+  { k:"اقتباس",       a:"quote",        d:"سطر مميّز بخطّ جانبي",     run:() => exec("formatBlock","<blockquote>") },
+  { k:"كود",          a:"code pre",     d:"كتلة شيفرة",              run:() => exec("formatBlock","<pre>") },
+  { k:"صورة",         a:"image img",    d:"من معرض المقال أو رفع جديد", run:() => openPicker() },
+  { k:"جدول",         a:"table",        d:"جدول ٣×٣",                run:() => $$("#rteBar [data-cmd='table']")[0].click() },
+  { k:"فيديو",        a:"video youtube",d:"تضمين فيديو يوتيوب",      run:() => $$("#rteBar [data-cmd='video']")[0].click() },
+  { k:"فاصل",         a:"hr line",      d:"خطّ فاصل",                run:() => exec("insertHorizontalRule") },
+  { k:"رابط",         a:"link url",     d:"تحويل التحديد إلى رابط",  run:() => { const u = prompt("رابط الوجهة:", "https://"); if (u) exec("createLink", u); } }
+];
+const slashBox = $("#slashMenu");
+let slashOpen = false, slashItems = [], slashIdx = 0, slashAnchor = null;
+
+function closeSlash(){ slashOpen = false; slashBox.classList.add("hide"); slashAnchor = null; }
+function openSlash(query, rect){
+  const q = query.trim().toLowerCase();
+  slashItems = SLASH.filter(c => !q || c.k.includes(q) || c.a.includes(q));
+  if (!slashItems.length) return closeSlash();
+  slashIdx = 0; slashOpen = true;
+  slashBox.innerHTML = slashItems.map((c,i) =>
+    `<div class="item ${i?"":"on"}" data-i="${i}">${c.k}<small>${c.d}</small></div>`).join("");
+  $$("#slashMenu .item").forEach(el => {
+    el.addEventListener("mousedown", e => e.preventDefault());
+    el.onclick = () => runSlash(+el.dataset.i);
+  });
+  slashBox.classList.remove("hide");
+  const top = Math.min(rect.bottom + 6, innerHeight - 300);
+  slashBox.style.top = Math.max(8, top) + "px";
+  slashBox.style.insetInlineStart = "";
+  slashBox.style.left = Math.max(8, Math.min(rect.left, innerWidth - 270)) + "px";
+}
+function markSlash(){ $$("#slashMenu .item").forEach((el,i) => el.classList.toggle("on", i === slashIdx)); }
+function runSlash(i){
+  const cmd = slashItems[i]; if (!cmd) return;
+  if (slashAnchor){
+    const r = document.createRange();
+    r.setStart(slashAnchor.node, slashAnchor.start);
+    r.setEnd(slashAnchor.node, Math.min(slashAnchor.end, slashAnchor.node.textContent.length));
+    r.deleteContents();
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+  closeSlash();
+  cmd.run();
+}
+rte.addEventListener("input", () => {
+  const sel = getSelection();
+  if (!sel.rangeCount) return closeSlash();
+  const r = sel.getRangeAt(0), node = r.startContainer;
+  if (node.nodeType !== 3) return closeSlash();
+  const before = node.textContent.slice(0, r.startOffset);
+  const m = before.match(/\/([^\/\s]*)$/);
+  if (!m) return closeSlash();
+  const prev = before[m.index - 1];
+  if (prev && !/\s|\u00a0/.test(prev)) return closeSlash();
+  slashAnchor = { node, start: m.index, end: r.startOffset };
+  const rect = r.getClientRects()[0] || rte.getBoundingClientRect();
+  openSlash(m[1], rect);
+});
+rte.addEventListener("keydown", e => {
+  if (!slashOpen) return;
+  if (e.key === "ArrowDown"){ e.preventDefault(); slashIdx = (slashIdx+1) % slashItems.length; markSlash(); }
+  else if (e.key === "ArrowUp"){ e.preventDefault(); slashIdx = (slashIdx-1+slashItems.length) % slashItems.length; markSlash(); }
+  else if (e.key === "Enter" || e.key === "Tab"){ e.preventDefault(); runSlash(slashIdx); }
+  else if (e.key === "Escape"){ closeSlash(); }
+});
+rte.addEventListener("blur", () => setTimeout(closeSlash, 120));
+
+/* ---------- 9.e اختيار صورة للإدراج ---------- */
+function openPicker(){
+  const sel = getSelection();
+  if (sel.rangeCount && rte.contains(sel.anchorNode)) savedRange = sel.getRangeAt(0).cloneRange();
+  const box = $("#pickGal");
+  box.innerHTML = images.length
+    ? images.map((src,i) => `<div class="pick-item" data-i="${i}"><img src="${src}" alt=""></div>`).join("")
+    : `<p class="hint" style="grid-column:1/-1;margin:0">لا صور في المقال بعد — ارفع واحدة.</p>`;
+  $$("#pickGal .pick-item").forEach(el => el.onclick = () => { closePicker(); insertImageAt(+el.dataset.i); });
+  $("#imgPick").classList.remove("hide");
+}
+function closePicker(){ $("#imgPick").classList.add("hide"); }
+$("#pickClose").onclick = closePicker;
+$("#imgPick").onclick = e => { if (e.target.id === "imgPick") closePicker(); };
+$("#pickUpload").onclick = () => {
+  const inp = document.createElement("input");
+  inp.type = "file"; inp.accept = "image/*";
+  inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    try{
+      const data = await compress(f);
+      images.push(data); renderGallery(); closePicker(); insertImageAt(images.length - 1);
+    }catch{ toast("تعذّرت قراءة الصورة", "err"); }
+  };
+  inp.click();
+};
+
+/* ---------- 9.f التبديل بين المحرّر و HTML ---------- */
+const HINTS = {
+  rte:  "اكتب كما في معالج النصوص. اضغط ‎/ في سطر فارغ لقائمة الأوامر (عنوان، قائمة، صورة، جدول، فيديو…). يمكن لصق صورة مباشرة داخل النص.",
+  html: "HTML خام: ‎&lt;h2&gt; &lt;p&gt; &lt;ul&gt; &lt;img&gt; &lt;table&gt; &lt;iframe&gt; وسمات style. تُحذف ‎&lt;script&gt; ومعالجات on* عند العرض. الصور المرفوعة تُكتب ‎{{img1}}."
+};
+function setMode(m){
+  const next = m === "html" ? "html" : "rte";
+  if (next === "html" && editorMode === "rte") srcTA.value = tokenize(rte);
+  if (next === "rte" && editorMode === "html") { rte.innerHTML = detokenize(srcTA.value); syncEmpty(); }
+  editorMode = next;
+  $$("#fmtSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.fmt === editorMode));
+  $("#rteWrap").classList.toggle("hide", editorMode !== "rte");
+  srcTA.classList.toggle("hide", editorMode !== "html");
+  $("#fmtHint").innerHTML = HINTS[editorMode];
+  if (!$("#previewBox").classList.contains("hide")) drawPreview();
+}
+$$("#fmtSeg button").forEach(b => b.onclick = () => setMode(b.dataset.fmt));
 function drawPreview(){
   const out = $("#previewOut");
-  out.innerHTML = buildContent({ content: $("#f-content").value, format: contentFormat, images });
+  out.innerHTML = buildContent({ content: currentContent(), format: "html", images });
   wireZoom(out);
 }
 $("#togglePreview").onclick = () => {
-  const box = $("#previewBox"), on = box.classList.toggle("hide");
-  $("#togglePreview").textContent = on ? "معاينة" : "إخفاء المعاينة";
-  if (!on) drawPreview();
+  const hidden = $("#previewBox").classList.toggle("hide");
+  $("#togglePreview").textContent = hidden ? "معاينة" : "إخفاء المعاينة";
+  if (!hidden) drawPreview();
 };
-$("#f-content").addEventListener("input", () => { if (!$("#previewBox").classList.contains("hide")) drawPreview(); });
+srcTA.addEventListener("input", () => { if (!$("#previewBox").classList.contains("hide")) drawPreview(); });
 
 /* ---------- 10. نشر / تعديل / حذف ---------- */
 $("#postForm").onsubmit = async e => {
@@ -1201,12 +1527,17 @@ $("#postForm").onsubmit = async e => {
     category:$("#f-cat").value,
     author:  $("#f-author").value.trim() || "فريق التحرير",
     excerpt: $("#f-excerpt").value.trim(),
-    content: $("#f-content").value.trim(),
-    format:  contentFormat,
+    content: currentContent(),
+    format:  "html",
     images:  [...images],
     image:   images[0] || "",
     updatedAt: serverTimestamp()
   };
+  const bare = data.content.replace(/<[^>]+>/g, "").replace(/&nbsp;|\s/g, "");
+  if (!bare && !/<img|<iframe|<hr/i.test(data.content)){
+    btn.disabled = false; btn.textContent = editingId ? "حفظ التعديلات" : "نشر المقال";
+    return toast("اكتب نصّ المقال قبل النشر", "err");
+  }
   const weight = new Blob([JSON.stringify(data)]).size;
   if (weight > 950000){
     btn.disabled = false; btn.textContent = editingId ? "حفظ التعديلات" : "نشر المقال";
@@ -1234,7 +1565,8 @@ function resetForm(){
   editingId = null;
   setImages([]);
   $("#postForm").reset();
-  setFormat("md");
+  setContent("");
+  setMode("rte");
   $("#previewBox").classList.add("hide");
   $("#togglePreview").textContent = "معاينة";
   $("#editorTitle").textContent = "مقال جديد";
@@ -1249,9 +1581,9 @@ function startEdit(p){
   $("#f-cat").value = p.category || CATEGORIES[0];
   $("#f-author").value = p.author || "";
   $("#f-excerpt").value = p.excerpt || "";
-  $("#f-content").value = p.content || "";
-  setFormat(p.format === "html" ? "html" : "md");
   setImages(articleImages(p));
+  setContent(p.format === "html" ? (p.content || "") : renderContent(p.content || ""));
+  setMode("rte");
   $("#editorTitle").textContent = "تعديل المقال";
   $("#saveBtn").textContent = "حفظ التعديلات";
   $("#cancelEdit").classList.remove("hide");
@@ -1295,8 +1627,9 @@ function renderAdminList(){
 }
 
 /* ---------- 11. تفاصيل صغيرة ---------- */
-setFormat("md");
 renderGallery();
+setMode("rte");
+setContent("");
 $("#burger").onclick = () => $("#nav").classList.toggle("closed");
 $("#year").textContent = new Date().getFullYear();
 $$(".yr").forEach(e => e.textContent = new Date().getFullYear());
