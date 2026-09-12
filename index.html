@@ -158,9 +158,9 @@ section{padding-block:4.5rem}
 .dot{width:3px;height:3px;background:var(--muted);border-radius:50%;opacity:.6}
 
 /* الشبكة */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1px;background:var(--line-2);border:1px solid var(--line-2)}
-.card{background:var(--ink);padding:1.7rem;cursor:pointer;transition:background .3s;display:flex;flex-direction:column;gap:.85rem}
-.card:hover{background:var(--ink-2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem}
+.card{background:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r);padding:1.5rem;cursor:pointer;transition:border-color .3s,transform .3s var(--ease);display:flex;flex-direction:column;gap:.8rem}
+.card:hover{border-color:var(--line);transform:translateY(-3px)}
 .card .thumb{aspect-ratio:16/9;overflow:hidden;border-radius:3px;background:var(--ink-3)}
 .card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease),filter .5s;filter:saturate(.9)}
 .card:hover .thumb img{transform:scale(1.05);filter:saturate(1.05)}
@@ -340,13 +340,15 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
 /* المحرّر المرئي */
 .rte-wrap{border:1px solid var(--line-2);border-radius:var(--r);background:var(--ink);overflow:hidden;transition:border-color .2s}
 .rte-wrap:focus-within{border-color:var(--gold)}
-.rte-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.12rem;padding:.4rem;background:var(--ink-2);border-bottom:1px solid var(--line-2);position:sticky;top:70px;z-index:5}
+.rte-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.2rem;padding:.45rem .5rem;background:var(--ink-2);border-bottom:1px solid var(--line-2)}
+.rte-bar select,.rte-bar input{width:auto}
 .rte-bar button{background:none;border:0;color:var(--muted);min-width:30px;height:30px;border-radius:4px;cursor:pointer;font-size:.92rem;display:grid;place-items:center;transition:.15s;padding:0}
 .rte-bar button:hover{background:var(--ink-3);color:var(--parchment)}
 .rte-bar button.on{background:var(--gold);color:var(--ink)}
-.rte-bar button.wide{padding:0 .6rem;font-size:.8rem}
+.rte-bar button.wide{padding:0 .6rem;font-size:.8rem;min-width:auto}
+.rte-bar button[data-block]{font-family:"Aref Ruqaa",serif;font-size:.9rem}
 .rte-bar select{background:var(--ink);border:1px solid var(--line-2);border-radius:4px;color:var(--parchment);padding:.28rem .4rem;font-size:.82rem;cursor:pointer}
-.rte-bar input[type=color]{width:30px;height:30px;padding:2px;border:1px solid var(--line-2);border-radius:4px;background:var(--ink);cursor:pointer}
+.rte-bar input[type=color]{width:30px;height:30px;padding:2px;border:1px solid var(--line-2);border-radius:4px;background:var(--ink);cursor:pointer;flex:0 0 auto}
 .rte-bar .sep{width:1px;height:20px;background:var(--line-2);margin:0 .3rem;flex-shrink:0}
 .rte{min-height:270px;max-height:60vh;overflow:auto;padding:1.3rem 1.4rem;outline:none;line-height:2;overflow-wrap:break-word}
 .rte.empty::before{content:attr(data-ph);color:#6d7796;pointer-events:none}
@@ -552,30 +554,16 @@ footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted
             <div class="field">
               <div class="editor-head">
                 <label style="margin:0">نصّ المقال</label>
-                <div style="display:flex;gap:.5rem;align-items:center">
-                  <div class="seg" id="fmtSeg">
-                    <button type="button" data-fmt="rte" aria-pressed="true">محرّر</button>
-                    <button type="button" data-fmt="html" aria-pressed="false">HTML</button>
-                  </div>
-                  <button type="button" class="btn ghost" id="togglePreview">معاينة</button>
-                </div>
+                <button type="button" class="btn ghost" id="togglePreview">معاينة</button>
               </div>
 
               <div class="rte-wrap" id="rteWrap">
                 <div class="rte-bar" id="rteBar">
-                  <select id="rteBlock" title="نمط الفقرة">
-                    <option value="p">عادي</option>
-                    <option value="h2">عنوان</option>
-                    <option value="h3">عنوان فرعي</option>
-                    <option value="blockquote">اقتباس</option>
-                    <option value="pre">كود</option>
-                  </select>
-                  <select id="rteSize" title="حجم الخط">
-                    <option value="2">صغير</option>
-                    <option value="3" selected>عادي</option>
-                    <option value="5">كبير</option>
-                    <option value="6">أكبر</option>
-                  </select>
+                  <button type="button" data-block="p" class="wide" title="فقرة عادية">عادي</button>
+                  <button type="button" data-block="h2" class="wide" title="عنوان">عنوان</button>
+                  <button type="button" data-block="h3" class="wide" title="عنوان فرعي">فرعي</button>
+                  <button type="button" data-block="blockquote" class="wide" title="اقتباس">اقتباس</button>
+                  <button type="button" data-block="pre" class="wide" title="كتلة شيفرة">كود</button>
                   <span class="sep"></span>
                   <button type="button" data-cmd="bold" title="عريض"><b>B</b></button>
                   <button type="button" data-cmd="italic" title="مائل"><i>I</i></button>
@@ -910,7 +898,6 @@ function renderList(){
     : "لم يُنشر أي مقال بعد";
 
   if (!list.length){
-    grid.style.border = "none";
     empty.innerHTML = posts.length
       ? `<div class="empty"><strong>لا نتيجة مطابقة</strong>جرّب كلمة أخرى أو أعد الاختيار إلى «الكل».</div>`
       : (isAdmin
@@ -918,10 +905,8 @@ function renderList(){
           : `<div class="empty"><strong>لا مقالات بعد</strong>المحتوى الأول في الطريق — عُد قريبًا.</div>`);
     return;
   }
-  grid.style.border = "";
-
   const rest = [...list];
-  if (filterCat === "الكل" && !searchTerm && rest.length > 2){
+  if (filterCat === "الكل" && !searchTerm && rest.length){
     const p = rest.shift();
     const el = document.createElement("article");
     el.className = "featured";
@@ -1260,7 +1245,6 @@ addEventListener("keydown", e => {
 
 /* ---------- 9.c المحرّر المرئي (WYSIWYG) ---------- */
 const rte = $("#rte"), srcTA = $("#f-content");
-let editorMode = "rte";           // rte | html
 let savedRange = null;
 
 /* تحويل الصور المرفوعة إلى رموز عند التخزين، والعكس عند التحرير */
@@ -1283,7 +1267,7 @@ function detokenize(html){
   });
   return t.innerHTML;
 }
-function currentContent(){ return editorMode === "rte" ? tokenize(rte) : srcTA.value.trim(); }
+function currentContent(){ return tokenize(rte); }
 /* عند حذف صورة أو تغيير الغلاف: تُحدَّث الصور الموضوعة داخل النص */
 function remapContentImages(map){
   [...rte.querySelectorAll("img[data-img]")].forEach(im => {
@@ -1320,15 +1304,8 @@ function insertHTML(html){
 function insertImageAt(i){
   const src = images[i];
   if (!src) return;
-  if (editorMode === "rte") insertHTML(`<img data-img="${i+1}" src="${src}"><p><br></p>`);
-  else insertAtCursorTA(`<img src="{{img${i+1}}}" alt="">`);
+  insertHTML(`<img data-img="${i+1}" src="${src}"><p><br></p>`);
   toast("أُدرجت الصورة في النص", "ok");
-}
-function insertAtCursorTA(text){
-  const a = srcTA.selectionStart ?? srcTA.value.length, b = srcTA.selectionEnd ?? a;
-  srcTA.value = srcTA.value.slice(0,a) + text + srcTA.value.slice(b);
-  srcTA.focus(); srcTA.selectionStart = srcTA.selectionEnd = a + text.length;
-  if (!$("#previewBox").classList.contains("hide")) drawPreview();
 }
 document.execCommand("styleWithCSS", false, true);
 
@@ -1352,9 +1329,11 @@ $$("#rteBar [data-cmd]").forEach(b => {
     } else exec(c);
   };
 });
-$("#rteBlock").onchange = e => { exec("formatBlock", "<" + e.target.value + ">"); };
-$("#rteSize").onchange  = e => { exec("fontSize", e.target.value); };
-$("#rteColor").oninput  = e => { exec("foreColor", e.target.value); };
+$$("#rteBar [data-block]").forEach(b => {
+  b.addEventListener("mousedown", e => e.preventDefault());
+  b.onclick = () => exec("formatBlock", "<" + b.dataset.block + ">");
+});
+$("#rteColor").oninput = e => { exec("foreColor", e.target.value); };
 
 function refreshBar(){
   $$("#rteBar [data-cmd]").forEach(b => {
@@ -1366,8 +1345,8 @@ function refreshBar(){
   });
   let block = "p";
   try{ block = (document.queryCommandValue("formatBlock") || "p").toLowerCase(); }catch{}
-  const sel = $("#rteBlock");
-  sel.value = [...sel.options].some(o => o.value === block) ? block : "p";
+  if (block === "div" || !block) block = "p";
+  $$("#rteBar [data-block]").forEach(b => b.classList.toggle("on", b.dataset.block === block));
 }
 ["keyup","mouseup","focus"].forEach(ev => rte.addEventListener(ev, refreshBar));
 rte.addEventListener("input", syncEmpty);
@@ -1488,22 +1467,7 @@ $("#pickUpload").onclick = () => {
 };
 
 /* ---------- 9.f التبديل بين المحرّر و HTML ---------- */
-const HINTS = {
-  rte:  "اكتب كما في معالج النصوص. اضغط ‎/ في سطر فارغ لقائمة الأوامر (عنوان، قائمة، صورة، جدول، فيديو…). يمكن لصق صورة مباشرة داخل النص.",
-  html: "HTML خام: ‎&lt;h2&gt; &lt;p&gt; &lt;ul&gt; &lt;img&gt; &lt;table&gt; &lt;iframe&gt; وسمات style. تُحذف ‎&lt;script&gt; ومعالجات on* عند العرض. الصور المرفوعة تُكتب ‎{{img1}}."
-};
-function setMode(m){
-  const next = m === "html" ? "html" : "rte";
-  if (next === "html" && editorMode === "rte") srcTA.value = tokenize(rte);
-  if (next === "rte" && editorMode === "html") { rte.innerHTML = detokenize(srcTA.value); syncEmpty(); }
-  editorMode = next;
-  $$("#fmtSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.fmt === editorMode));
-  $("#rteWrap").classList.toggle("hide", editorMode !== "rte");
-  srcTA.classList.toggle("hide", editorMode !== "html");
-  $("#fmtHint").innerHTML = HINTS[editorMode];
-  if (!$("#previewBox").classList.contains("hide")) drawPreview();
-}
-$$("#fmtSeg button").forEach(b => b.onclick = () => setMode(b.dataset.fmt));
+$("#fmtHint").textContent = "اكتب كما في معالج النصوص. اضغط / في سطر فارغ لقائمة الأوامر: عنوان، قائمة، صورة، جدول، فيديو… ويمكن لصق صورة مباشرة داخل النص.";
 function drawPreview(){
   const out = $("#previewOut");
   out.innerHTML = buildContent({ content: currentContent(), format: "html", images });
@@ -1514,7 +1478,7 @@ $("#togglePreview").onclick = () => {
   $("#togglePreview").textContent = hidden ? "معاينة" : "إخفاء المعاينة";
   if (!hidden) drawPreview();
 };
-srcTA.addEventListener("input", () => { if (!$("#previewBox").classList.contains("hide")) drawPreview(); });
+
 
 /* ---------- 10. نشر / تعديل / حذف ---------- */
 $("#postForm").onsubmit = async e => {
@@ -1566,7 +1530,6 @@ function resetForm(){
   setImages([]);
   $("#postForm").reset();
   setContent("");
-  setMode("rte");
   $("#previewBox").classList.add("hide");
   $("#togglePreview").textContent = "معاينة";
   $("#editorTitle").textContent = "مقال جديد";
@@ -1583,7 +1546,6 @@ function startEdit(p){
   $("#f-excerpt").value = p.excerpt || "";
   setImages(articleImages(p));
   setContent(p.format === "html" ? (p.content || "") : renderContent(p.content || ""));
-  setMode("rte");
   $("#editorTitle").textContent = "تعديل المقال";
   $("#saveBtn").textContent = "حفظ التعديلات";
   $("#cancelEdit").classList.remove("hide");
@@ -1628,7 +1590,6 @@ function renderAdminList(){
 
 /* ---------- 11. تفاصيل صغيرة ---------- */
 renderGallery();
-setMode("rte");
 setContent("");
 $("#burger").onclick = () => $("#nav").classList.toggle("closed");
 $("#year").textContent = new Date().getFullYear();
