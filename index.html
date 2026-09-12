@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ذكاء — منصّة عربية في الذكاء الاصطناعي</title>
+<meta name="description" content="مقالات ومقاربات عربية حول الذكاء الاصطناعي: تعلّم الآلة، معالجة اللغة، الرؤية الحاسوبية، والأخلاقيات.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230d1224'/><text y='72' x='50' text-anchor='middle' font-size='64' fill='%23e8b15c' font-family='serif'>ذ</text></svg>">
+
+<style>
+/* ============================================================
+   1. TOKENS
+   ============================================================ */
+:root{
+  --ink:#0d1224;          /* حبر الليل */
+  --ink-2:#121a33;        /* لوح */
+  --ink-3:#1a2344;        /* حدّ فاتح */
+  --gold:#e8b15c;         /* ذهب المخطوط */
+  --gold-soft:#f4d79a;
+  --parchment:#ece5d6;    /* نص أساسي */
+  --muted:#97a1bd;
+  --danger:#e0705f;
+  --ok:#78c9a8;
+  --line:rgba(232,177,92,.18);
+  --line-2:rgba(236,229,214,.10);
+  --shell:min(1180px,100% - 2.5rem);
+  --r:6px;
+  --ease:cubic-bezier(.22,.7,.3,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--ink); color:var(--parchment);
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  font-size:17px; line-height:1.85; font-weight:300;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+h1,h2,h3,.display{font-family:"Aref Ruqaa",Georgia,serif; font-weight:400; line-height:1.5; margin:0}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:3px}
+::selection{background:var(--gold);color:var(--ink)}
+.shell{width:var(--shell);margin-inline:auto}
+.hide{display:none !important}
+
+/* شريط التقدّم */
+#progress{position:fixed;top:0;right:0;height:2px;width:0;background:var(--gold);z-index:90;transition:width .1s linear}
+
+/* ============================================================
+   2. HEADER
+   ============================================================ */
+header{
+  position:sticky;top:0;z-index:60;
+  background:rgba(13,18,36,.78);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-2);
+}
+.bar{display:flex;align-items:center;gap:1.4rem;height:70px}
+.brand{display:flex;align-items:baseline;gap:.55rem;margin-inline-end:auto}
+.brand .mark{
+  font-family:"Aref Ruqaa",serif;font-size:1.75rem;color:var(--gold);
+  line-height:1;letter-spacing:.02em;
+}
+.brand small{color:var(--muted);font-size:.78rem;letter-spacing:.04em}
+nav.main{display:flex;gap:1.5rem;align-items:center}
+nav.main a{font-size:.95rem;color:var(--muted);padding-block:.3rem;position:relative;transition:color .25s}
+nav.main a::after{
+  content:"";position:absolute;inset-inline-start:0;bottom:0;height:1px;width:0;
+  background:var(--gold);transition:width .3s var(--ease);
+}
+nav.main a:hover{color:var(--parchment)}
+nav.main a:hover::after{width:100%}
+.btn{
+  border:1px solid var(--line);background:transparent;color:var(--gold);
+  padding:.5rem 1.1rem;border-radius:var(--r);cursor:pointer;font-size:.9rem;
+  transition:background .25s,color .25s,border-color .25s;white-space:nowrap;
+}
+.btn:hover{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.btn.solid{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:500}
+.btn.solid:hover{background:var(--gold-soft);border-color:var(--gold-soft)}
+.btn.ghost{color:var(--muted);border-color:var(--line-2)}
+.btn.ghost:hover{background:var(--ink-3);color:var(--parchment);border-color:var(--ink-3)}
+.btn.danger{color:var(--danger);border-color:rgba(224,112,95,.35)}
+.btn.danger:hover{background:var(--danger);color:var(--ink);border-color:var(--danger)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.burger{display:none;background:none;border:0;color:var(--gold);font-size:1.5rem;cursor:pointer;padding:.2rem .4rem}
+
+/* ============================================================
+   3. HERO — نقش هندسي يُرسم عند التحميل
+   ============================================================ */
+.hero{position:relative;min-height:min(86vh,760px);display:grid;align-items:center;overflow:hidden}
+#girih{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(115% 85% at 70% 40%,transparent 25%,var(--ink) 78%);
+}
+.hero-in{position:relative;z-index:2;padding-block:5rem;max-width:41ch}
+.kicker{
+  color:var(--gold);font-size:.85rem;letter-spacing:.08em;margin-bottom:1.3rem;
+  display:flex;align-items:center;gap:.7rem;
+}
+.kicker::before{content:"";width:34px;height:1px;background:var(--gold);display:block}
+.hero h1{font-size:clamp(2.3rem,6vw,4rem);color:var(--parchment);line-height:1.35}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p{color:var(--muted);margin:1.4rem 0 2.2rem;font-size:1.05rem;max-width:38ch}
+.hero-actions{display:flex;gap:.8rem;flex-wrap:wrap}
+.reveal-line{opacity:0;transform:translateY(16px);animation:rise .9s var(--ease) forwards}
+.reveal-line:nth-child(1){animation-delay:.15s}
+.reveal-line:nth-child(2){animation-delay:.3s}
+.reveal-line:nth-child(3){animation-delay:.45s}
+.reveal-line:nth-child(4){animation-delay:.6s}
+@keyframes rise{to{opacity:1;transform:none}}
+
+/* ============================================================
+   4. المقالات
+   ============================================================ */
+section{padding-block:4.5rem}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.2rem}
+.sec-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem)}
+.sec-head p{color:var(--muted);margin:.35rem 0 0;font-size:.95rem}
+.rule{height:1px;background:linear-gradient(to left,var(--line),transparent);margin-bottom:2.2rem}
+
+.toolbar{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:2.4rem}
+.search{position:relative;flex:1;min-width:230px}
+.search input{
+  width:100%;background:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r);
+  padding:.72rem 2.6rem .72rem 1rem;transition:border-color .25s;
+}
+.search input::placeholder{color:#6d7796}
+.search input:focus{border-color:var(--line);outline:none}
+.search svg{position:absolute;inset-inline-end:.9rem;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2}
+.chips{display:flex;gap:.45rem;flex-wrap:wrap}
+.chip{
+  border:1px solid var(--line-2);background:transparent;color:var(--muted);
+  padding:.45rem .95rem;border-radius:100px;cursor:pointer;font-size:.86rem;transition:.22s;
+}
+.chip:hover{color:var(--parchment);border-color:var(--line)}
+.chip[aria-pressed="true"]{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:500}
+
+/* المقال المميّز */
+.featured{
+  display:grid;grid-template-columns:1.05fr .95fr;gap:0;border:1px solid var(--line);
+  border-radius:var(--r);overflow:hidden;margin-bottom:2.5rem;cursor:pointer;
+  background:var(--ink-2);
+}
+.featured .thumb{aspect-ratio:16/11;overflow:hidden;background:var(--ink-3)}
+.featured .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.featured:hover .thumb img{transform:scale(1.04)}
+.featured .body{padding:2.4rem;display:flex;flex-direction:column;justify-content:center}
+.featured h3{font-size:clamp(1.4rem,2.6vw,2rem);margin-bottom:.7rem}
+.featured p{color:var(--muted);font-size:.98rem;margin:0 0 1.4rem}
+
+.meta{display:flex;gap:.9rem;align-items:center;color:var(--muted);font-size:.8rem;flex-wrap:wrap}
+.cat{color:var(--gold);border:1px solid var(--line);padding:.18rem .6rem;border-radius:100px;font-size:.76rem}
+.dot{width:3px;height:3px;background:var(--muted);border-radius:50%;opacity:.6}
+
+/* الشبكة */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1px;background:var(--line-2);border:1px solid var(--line-2)}
+.card{background:var(--ink);padding:1.7rem;cursor:pointer;transition:background .3s;display:flex;flex-direction:column;gap:.85rem}
+.card:hover{background:var(--ink-2)}
+.card .thumb{aspect-ratio:16/9;overflow:hidden;border-radius:3px;background:var(--ink-3)}
+.card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease),filter .5s;filter:saturate(.9)}
+.card:hover .thumb img{transform:scale(1.05);filter:saturate(1.05)}
+.card h3{font-size:1.22rem;line-height:1.55}
+.card p{color:var(--muted);font-size:.92rem;margin:0;flex:1}
+.card .more{color:var(--gold);font-size:.85rem;opacity:0;transform:translateX(6px);transition:.3s var(--ease)}
+.card:hover .more{opacity:1;transform:none}
+.stagger{opacity:0;transform:translateY(14px)}
+.stagger.in{opacity:1;transform:none;transition:opacity .6s var(--ease),transform .6s var(--ease)}
+
+.empty{
+  border:1px dashed var(--line);border-radius:var(--r);padding:3.5rem 1.5rem;text-align:center;color:var(--muted);
+}
+.empty strong{display:block;color:var(--parchment);font-family:"Aref Ruqaa",serif;font-size:1.3rem;margin-bottom:.5rem}
+.skeleton{background:var(--ink-2);border:1px solid var(--line-2);height:190px;border-radius:var(--r);position:relative;overflow:hidden}
+.skeleton::after{
+  content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(236,229,214,.05),transparent);
+  animation:sweep 1.4s infinite;
+}
+@keyframes sweep{100%{transform:translateX(100%)}}
+
+/* ============================================================
+   5. عن المنصّة
+   ============================================================ */
+#about{border-top:1px solid var(--line-2)}
+.facts{display:grid;grid-template-columns:1fr 1fr;column-gap:3.5rem;border-top:1px solid var(--line-2)}
+.fact{padding:1.3rem 0;border-bottom:1px solid var(--line-2)}
+.fact h4{margin:0 0 .3rem;font-size:1.02rem;font-weight:600;color:var(--parchment)}
+.fact span{color:var(--muted);font-size:.92rem}
+
+footer{border-top:1px solid var(--line-2);padding-block:2.5rem;color:var(--muted);font-size:.88rem}
+.foot{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center}
+
+/* ============================================================
+   6. قارئ المقال
+   ============================================================ */
+#reader{padding-block:3rem}
+.article{max-width:72ch;margin-inline:auto}
+.article .hero-img{width:100%;aspect-ratio:16/8;object-fit:cover;border-radius:var(--r);margin-block:1.8rem;border:1px solid var(--line-2)}
+.article h1{font-size:clamp(1.9rem,4.5vw,3rem);margin-block:.8rem}
+.article .content{font-size:1.06rem;line-height:2.05}
+.article .content h2{font-size:1.55rem;margin:2.4rem 0 .8rem;color:var(--gold-soft)}
+.article .content h3{font-size:1.25rem;margin:1.8rem 0 .6rem}
+.article .content p{margin:0 0 1.15rem}
+.article .content ul{padding-inline-start:1.3rem;margin:0 0 1.2rem}
+.article .content li{margin-bottom:.5rem}
+.article .content blockquote{
+  margin:1.6rem 0;padding:.3rem 1.2rem;border-inline-start:2px solid var(--gold);color:var(--gold-soft);
+}
+.article .content code{background:var(--ink-2);padding:.15rem .45rem;border-radius:3px;font-size:.9em;color:var(--gold-soft)}
+.article .content a{color:var(--gold);border-bottom:1px solid var(--line)}
+.back{display:inline-flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.92rem;transition:color .25s}
+.back:hover{color:var(--gold)}
+
+/* ============================================================
+   7. لوحة التحكّم
+   ============================================================ */
+.panel{background:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r);padding:1.8rem}
+.field{margin-bottom:1.15rem}
+.field label{display:block;font-size:.88rem;color:var(--muted);margin-bottom:.45rem}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--ink);border:1px solid var(--line-2);border-radius:var(--r);
+  padding:.7rem .9rem;transition:border-color .2s;
+}
+.field textarea{resize:vertical;min-height:130px;line-height:1.9}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);outline:none}
+.field .hint{font-size:.78rem;color:#6d7796;margin-top:.35rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.15rem}
+.drop{
+  border:1px dashed var(--line);border-radius:var(--r);padding:1.4rem;text-align:center;
+  color:var(--muted);cursor:pointer;transition:.25s;font-size:.9rem;
+}
+.drop:hover,.drop.over{background:var(--ink-3);border-color:var(--gold);color:var(--parchment)}
+.preview{margin-top:.9rem;position:relative;display:inline-block}
+.preview img{max-height:160px;border-radius:var(--r);border:1px solid var(--line-2)}
+.preview button{position:absolute;top:6px;inset-inline-end:6px;background:var(--ink);border:1px solid var(--line);color:var(--danger);border-radius:4px;cursor:pointer;padding:.1rem .45rem}
+
+.admin-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:1.6rem;align-items:start}
+.row{display:flex;gap:1rem;align-items:center;padding:.9rem 0;border-bottom:1px solid var(--line-2)}
+.row:last-child{border-bottom:0}
+.row img{width:64px;height:46px;object-fit:cover;border-radius:4px;flex-shrink:0;background:var(--ink-3)}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t span{color:var(--muted);font-size:.8rem}
+.row .acts{display:flex;gap:.4rem}
+.row .acts button{background:none;border:1px solid var(--line-2);color:var(--muted);border-radius:4px;padding:.3rem .6rem;cursor:pointer;font-size:.8rem;transition:.2s}
+.row .acts button:hover{color:var(--parchment);border-color:var(--line)}
+.row .acts button.del:hover{color:var(--danger);border-color:var(--danger)}
+
+/* ============================================================
+   8. نوافذ + تنبيهات
+   ============================================================ */
+.overlay{
+  position:fixed;inset:0;background:rgba(6,9,20,.82);backdrop-filter:blur(5px);
+  z-index:100;display:grid;place-items:center;padding:1.5rem;
+  animation:fade .25s var(--ease);
+}
+@keyframes fade{from{opacity:0}}
+.modal{
+  width:min(430px,100%);background:var(--ink-2);border:1px solid var(--line);
+  border-radius:var(--r);padding:2rem;animation:pop .3s var(--ease);
+}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}}
+.modal h3{font-size:1.5rem;margin-bottom:.35rem}
+.modal .sub{color:var(--muted);font-size:.9rem;margin:0 0 1.5rem}
+.modal-actions{display:flex;gap:.7rem;margin-top:1.4rem}
+.modal-actions .btn{flex:1;text-align:center}
+.msg{font-size:.88rem;padding:.6rem .8rem;border-radius:4px;margin-bottom:1rem}
+.msg.err{background:rgba(224,112,95,.12);color:var(--danger);border:1px solid rgba(224,112,95,.3)}
+
+#toasts{position:fixed;bottom:1.5rem;inset-inline-start:1.5rem;z-index:120;display:flex;flex-direction:column;gap:.6rem}
+.toast{
+  background:var(--ink-2);border:1px solid var(--line);border-inline-start:3px solid var(--gold);
+  padding:.8rem 1.1rem;border-radius:var(--r);font-size:.9rem;box-shadow:0 10px 30px rgba(0,0,0,.45);
+  animation:slidein .35s var(--ease);max-width:330px;
+}
+.toast.ok{border-inline-start-color:var(--ok)}
+.toast.err{border-inline-start-color:var(--danger)}
+@keyframes slidein{from{opacity:0;transform:translateX(-20px)}}
+
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-inline-end:.4rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ============================================================
+   9. استجابة + حركة مخفّضة
+   ============================================================ */
+@media(max-width:900px){
+  .featured{grid-template-columns:1fr}
+  .featured .body{padding:1.6rem}
+  .facts,.admin-grid,.two{grid-template-columns:1fr}
+}
+@media(max-width:680px){
+  body{font-size:16px}
+  nav.main{
+    position:absolute;top:70px;inset-inline:0;flex-direction:column;align-items:stretch;gap:0;
+    background:var(--ink-2);border-bottom:1px solid var(--line-2);padding:.5rem 1.25rem 1rem;
+  }
+  nav.main.closed{display:none}
+  nav.main a{padding:.7rem 0;border-bottom:1px solid var(--line-2)}
+  .burger{display:block}
+  .hero{min-height:auto}
+  .hero-in{padding-block:3.5rem}
+  section{padding-block:3rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::after,*::before{animation-duration:.001s !important;transition-duration:.001s !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+
+<body>
+<div id="progress"></div>
+
+<!-- ============ الترويسة ============ -->
+<header>
+  <div class="shell bar">
+    <a href="#/" class="brand">
+      <span class="mark">ذكاء</span>
+      <small>مجلّة الذكاء الاصطناعي</small>
+    </a>
+    <nav class="main closed" id="nav">
+      <a href="#/">الرئيسية</a>
+      <a href="#articles">المقالات</a>
+      <a href="#about">عن المنصّة</a>
+      <a href="#" id="adminLink" class="hide">لوحة التحكّم</a>
+    </nav>
+    <button class="btn ghost" id="loginBtn">دخول المحرّر</button>
+    <button class="btn ghost hide" id="logoutBtn">خروج</button>
+    <button class="burger" id="burger" aria-label="القائمة">☰</button>
+  </div>
+</header>
+
+<!-- ============ الواجهة العامة ============ -->
+<main id="publicView">
+
+  <div class="hero">
+    <canvas id="girih"></canvas>
+    <div class="shell hero-in">
+      <div class="kicker reveal-line">تُنشر بالعربية</div>
+      <h1 class="reveal-line">حين تتعلّم الآلة، <em>من يكتب القاعدة؟</em></h1>
+      <p class="reveal-line">شروحات ومقالات معمّقة عن نماذج التعلّم العميق، وتطبيقات الذكاء الاصطناعي وحدوده — بلغة يفهمها المهندس والقارئ العادي معًا.</p>
+      <div class="hero-actions reveal-line">
+        <a href="#articles" class="btn solid">تصفّح المقالات</a>
+        <a href="#about" class="btn">عن المنصّة</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="articles">
+    <div class="shell">
+      <div class="sec-head">
+        <div>
+          <h2>أحدث المقالات</h2>
+          <p id="countLabel">جارٍ تحميل المقالات…</p>
+        </div>
+      </div>
+      <div class="rule"></div>
+
+      <div class="toolbar">
+        <div class="search">
+          <input id="q" type="search" placeholder="ابحث في العناوين والمحتوى…" aria-label="بحث">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        </div>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <div id="featuredSlot"></div>
+      <div class="grid" id="grid">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+      <div id="emptySlot"></div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="shell">
+      <div class="sec-head">
+        <div>
+          <h2>عن المنصّة</h2>
+          <p>ما الذي تجده هنا، وكيف نكتبه.</p>
+        </div>
+      </div>
+      <div class="rule"></div>
+      <div class="facts">
+        <div class="fact"><h4>شروحات مبنيّة من الصفر</h4><span>نبدأ من المثال الملموس قبل المعادلة، لا العكس.</span></div>
+        <div class="fact"><h4>متابعة للنماذج والأدوات</h4><span>ما الجديد فعلًا في المجال، وما هو ضجيج تسويقي.</span></div>
+        <div class="fact"><h4>قراءة مفتوحة للجميع</h4><span>لا حساب ولا اشتراك — المحتوى متاح فور نشره.</span></div>
+        <div class="fact"><h4>موقف نقدي</h4><span>نذكر حدود التقنية وأثرها كما نذكر إنجازاتها.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="shell foot">
+      <span>© <span id="year"></span> ذكاء — جميع الحقوق محفوظة.</span>
+    </div>
+  </footer>
+</main>
+
+<!-- ============ قارئ المقال ============ -->
+<main id="reader" class="hide">
+  <div class="shell">
+    <a href="#/" class="back">→ العودة إلى المقالات</a>
+    <article class="article" id="articleBody"></article>
+  </div>
+  <footer style="margin-top:3rem">
+    <div class="shell foot"><span>© <span class="yr"></span> ذكاء</span></div>
+  </footer>
+</main>
+
+<!-- ============ لوحة التحكّم ============ -->
+<main id="adminView" class="hide">
+  <section>
+    <div class="shell">
+      <div class="sec-head">
+        <div>
+          <h2>لوحة التحكّم</h2>
+          <p id="adminWho"></p>
+        </div>
+        <a href="#/" class="btn ghost">عرض الموقع</a>
+      </div>
+      <div class="rule"></div>
+
+      <div class="admin-grid">
+        <div class="panel">
+          <h3 style="font-size:1.3rem;margin-bottom:1.3rem" id="editorTitle">مقال جديد</h3>
+          <form id="postForm">
+            <div class="field">
+              <label for="f-title">العنوان</label>
+              <input id="f-title" required maxlength="140" placeholder="مثال: كيف تفهم النماذج اللغوية الجملة العربية؟">
+            </div>
+            <div class="two">
+              <div class="field">
+                <label for="f-cat">التصنيف</label>
+                <select id="f-cat"></select>
+              </div>
+              <div class="field">
+                <label for="f-author">الكاتب</label>
+                <input id="f-author" placeholder="فريق التحرير">
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-excerpt">مقتطف قصير</label>
+              <input id="f-excerpt" maxlength="220" placeholder="سطر أو سطران يظهران في البطاقة">
+            </div>
+            <div class="field">
+              <label>صورة المقال</label>
+              <div class="drop" id="drop">اسحب صورة إلى هنا أو انقر للاختيار — تُضغط تلقائيًا قبل الحفظ</div>
+              <input type="file" id="f-file" accept="image/*" class="hide">
+              <div class="field" style="margin-top:.8rem;margin-bottom:0">
+                <input id="f-url" placeholder="أو الصق رابط صورة مباشر (https://…)">
+                <div class="hint">اترك الحقلين فارغين لنشر مقال بلا صورة.</div>
+              </div>
+              <div id="preview"></div>
+            </div>
+            <div class="field">
+              <label for="f-content">نصّ المقال</label>
+              <textarea id="f-content" required placeholder="اكتب هنا…&#10;&#10;## عنوان فرعي&#10;فقرة عادية، ويمكن **تعريض** كلمة.&#10;- نقطة في قائمة&#10;&gt; اقتباس"></textarea>
+              <div class="hint">تنسيق مبسّط: ‎## عنوان، ‎### عنوان أصغر، ‎**عريض**، ‎- قائمة، ‎&gt; اقتباس، ‎[نص](رابط)</div>
+            </div>
+            <div style="display:flex;gap:.7rem">
+              <button type="submit" class="btn solid" id="saveBtn">نشر المقال</button>
+              <button type="button" class="btn ghost hide" id="cancelEdit">إلغاء التعديل</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h3 style="font-size:1.3rem;margin-bottom:.4rem">المقالات المنشورة</h3>
+          <p style="color:var(--muted);font-size:.88rem;margin:0 0 1rem" id="adminCount"></p>
+          <div id="adminList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ نافذة الدخول ============ -->
+<div class="overlay hide" id="loginModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lt">
+    <h3 id="lt">دخول المحرّر</h3>
+    <p class="sub">هذه المساحة مخصّصة لإدارة المحتوى. القرّاء لا يحتاجون إلى حساب.</p>
+    <div id="loginMsg"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="f-email">البريد الإلكتروني</label>
+        <input id="f-email" type="email" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="f-pass">كلمة المرور</label>
+        <input id="f-pass" type="password" required autocomplete="current-password">
+      </div>
+      <div class="modal-actions">
+        <button class="btn solid" type="submit" id="doLogin">تسجيل الدخول</button>
+        <button class="btn ghost" type="button" id="closeLogin">إغلاق</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ نافذة الحذف ============ -->
+<div class="overlay hide" id="confirmModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3>حذف المقال</h3>
+    <p class="sub" id="confirmText"></p>
+    <div class="modal-actions">
+      <button class="btn danger" id="confirmYes">حذف نهائيًا</button>
+      <button class="btn ghost" id="confirmNo">تراجع</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<!-- ============================================================
+     JavaScript
+     ============================================================ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc,
+  query, orderBy, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* ---------- 1. إعداد Firebase ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyBLqWyUDY4_WEPgnlk7mQWnfIB8YOcWEc8",
+  authDomain: "ai-blog-ab9b8.firebaseapp.com",
+  projectId: "ai-blog-ab9b8",
+  storageBucket: "ai-blog-ab9b8.firebasestorage.app",
+  messagingSenderId: "765375469473",
+  appId: "1:765375469473:web:8f47f88464db6978da1de0",
+  measurementId: "G-DR9DTHPNRV"
+};
+
+// ⬅️ ضع هنا UID حساب المدير (Firebase Console → Authentication → Users)
+// اتركه فارغًا ليُعتبر كل حساب مسجَّل مديرًا (قواعد Firestore تبقى خط الدفاع الأول).
+const ADMIN_UID = "";
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+const POSTS = collection(db, "posts");
+setPersistence(auth, browserLocalPersistence).catch(()=>{});
+
+/* ---------- 2. أدوات ---------- */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const CATEGORIES = ["تعلّم الآلة","معالجة اللغة","الرؤية الحاسوبية","أخلاقيات وسياسات","أدوات وتطبيقات","أخبار ونماذج"];
+
+function escapeHtml(s=""){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+function toast(text, kind=""){
+  const el = document.createElement("div");
+  el.className = "toast " + kind;
+  el.textContent = text;
+  $("#toasts").appendChild(el);
+  setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .3s"; setTimeout(()=>el.remove(),300); }, 3400);
+}
+function readTime(text=""){
+  const w = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(w/180));
+}
+function fmtDate(ts){
+  const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : new Date());
+  return d.toLocaleDateString("ar", { year:"numeric", month:"long", day:"numeric" });
+}
+/* تنسيق مبسّط -> HTML آمن */
+function renderContent(text=""){
+  const lines = escapeHtml(text).split(/\r?\n/);
+  const inline = s => s
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+?)`/g, "<code>$1</code>")
+    .replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  const out = []; let list = false;
+  for (const raw of lines){
+    const l = raw.trim();
+    if (/^-\s+/.test(l)){ if(!list){ out.push("<ul>"); list = true; } out.push("<li>"+inline(l.replace(/^-\s+/,""))+"</li>"); continue; }
+    if (list){ out.push("</ul>"); list = false; }
+    if (!l) continue;
+    if (/^###\s+/.test(l))      out.push("<h3>"+inline(l.replace(/^###\s+/,""))+"</h3>");
+    else if (/^##\s+/.test(l))  out.push("<h2>"+inline(l.replace(/^##\s+/,""))+"</h2>");
+    else if (/^&gt;\s*/.test(l))out.push("<blockquote>"+inline(l.replace(/^&gt;\s*/,""))+"</blockquote>");
+    else                        out.push("<p>"+inline(l)+"</p>");
+  }
+  if (list) out.push("</ul>");
+  return out.join("");
+}
+function placeholder(title=""){
+  const ch = escapeHtml((title||"ذ").trim().charAt(0) || "ذ");
+  return "data:image/svg+xml," + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><rect width="320" height="180" fill="#1a2344"/><text x="160" y="118" text-anchor="middle" font-size="84" fill="#e8b15c" opacity=".45" font-family="serif">${ch}</text></svg>`
+  );
+}
+
+/* ---------- 3. نقش الواجهة (Canvas) ---------- */
+(function girih(){
+  const cv = $("#girih"), ctx = cv.getContext("2d");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let segs = [], t0 = 0, mx = 0, my = 0, raf;
+
+  function build(){
+    const dpr = Math.min(devicePixelRatio||1, 2);
+    const w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = w*dpr; cv.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    segs = [];
+    const cell = w < 620 ? 78 : 104, r = cell*0.46;
+    const cols = Math.ceil(w/cell)+2, rows = Math.ceil(h/cell)+2;
+    const cx0 = w*0.72, cy0 = h*0.45;           // مركز انطلاق الرسم
+    for (let i=-1;i<cols;i++) for (let j=-1;j<rows;j++){
+      const cx = i*cell + cell/2, cy = j*cell + cell/2;
+      const pts = [];
+      for (let k=0;k<8;k++){ const a = k*Math.PI/4 + Math.PI/8; pts.push([cx+Math.cos(a)*r, cy+Math.sin(a)*r]); }
+      for (let k=0;k<8;k++){                      // نجمة ثمانية {8/3}
+        const p = pts[k], q = pts[(k+3)%8];
+        segs.push({x1:p[0],y1:p[1],x2:q[0],y2:q[1],d:Math.hypot(cx-cx0,cy-cy0)});
+      }
+      segs.push({x1:cx+r,y1:cy,x2:cx+cell-r,y2:cy,d:Math.hypot(cx-cx0,cy-cy0)});   // وصلات أفقية
+      segs.push({x1:cx,y1:cy+r,x2:cx,y2:cy+cell-r,d:Math.hypot(cx-cx0,cy-cy0)});   // وصلات رأسية
+    }
+    const max = Math.max(...segs.map(s=>s.d), 1);
+    segs.forEach(s => s.n = s.d/max);
+  }
+
+  function frame(now){
+    if (!t0) t0 = now;
+    const el = (now - t0)/1000;
+    const w = cv.clientWidth, h = cv.clientHeight;
+    ctx.clearRect(0,0,w,h);
+    ctx.lineWidth = 1; ctx.lineCap = "round";
+    const draw = reduced ? 1 : Math.min(1, el/2.6);          // تقدّم الرسم عند التحميل
+    const breathe = reduced ? 1 : 0.82 + Math.sin(el*0.7)*0.18;
+    ctx.save();
+    ctx.translate(mx*14, my*14);                              // انزياح خفيف مع المؤشّر
+    for (const s of segs){
+      if (s.n > draw) continue;
+      const fade = Math.min(1,(draw - s.n)*6);
+      ctx.strokeStyle = `rgba(232,177,92,${(0.055 + 0.1*(1-s.n)) * fade * breathe})`;
+      ctx.beginPath(); ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2); ctx.stroke();
+    }
+    ctx.restore();
+    raf = requestAnimationFrame(frame);
+  }
+
+  function start(){ build(); cancelAnimationFrame(raf); t0 = 0; raf = requestAnimationFrame(frame); }
+  addEventListener("resize", () => { clearTimeout(cv._t); cv._t = setTimeout(start, 200); });
+  addEventListener("pointermove", e => { mx = (e.clientX/innerWidth-.5); my = (e.clientY/innerHeight-.5); }, {passive:true});
+  document.addEventListener("visibilitychange", () => document.hidden ? cancelAnimationFrame(raf) : (raf = requestAnimationFrame(frame)));
+  start();
+})();
+
+/* شريط تقدّم القراءة */
+addEventListener("scroll", () => {
+  const max = document.body.scrollHeight - innerHeight;
+  $("#progress").style.width = (max > 0 ? (scrollY/max)*100 : 0) + "%";
+}, {passive:true});
+
+/* ---------- 4. الحالة ---------- */
+let posts = [];            // كل المقالات
+let filterCat = "الكل";
+let searchTerm = "";
+let isAdmin = false;
+let editingId = null;
+let imageData = "";        // base64 أو رابط
+
+/* ---------- 5. العرض العام ---------- */
+function visible(){
+  const t = searchTerm.trim().toLowerCase();
+  return posts.filter(p => {
+    const okCat = filterCat === "الكل" || p.category === filterCat;
+    const okTxt = !t || (p.title+" "+(p.excerpt||"")+" "+(p.content||"")).toLowerCase().includes(t);
+    return okCat && okTxt;
+  });
+}
+function cardHTML(p){
+  return `
+    <div class="thumb"><img loading="lazy" src="${p.image || placeholder(p.title)}" alt="${escapeHtml(p.title)}"></div>
+    <div class="meta"><span class="cat">${escapeHtml(p.category||"عام")}</span><i class="dot"></i><span>${fmtDate(p.createdAt)}</span></div>
+    <h3>${escapeHtml(p.title)}</h3>
+    <p>${escapeHtml(p.excerpt || (p.content||"").slice(0,130)+"…")}</p>
+    <span class="more">اقرأ المقال →</span>`;
+}
+function renderList(){
+  const list = visible();
+  const grid = $("#grid"), feat = $("#featuredSlot"), empty = $("#emptySlot");
+  grid.innerHTML = ""; feat.innerHTML = ""; empty.innerHTML = "";
+
+  $("#countLabel").textContent = posts.length
+    ? `${posts.length} مقالًا منشورًا · ${list.length} ظاهر الآن`
+    : "لم يُنشر أي مقال بعد";
+
+  if (!list.length){
+    grid.style.border = "none";
+    empty.innerHTML = posts.length
+      ? `<div class="empty"><strong>لا نتيجة مطابقة</strong>جرّب كلمة أخرى أو أعد الاختيار إلى «الكل».</div>`
+      : (isAdmin
+          ? `<div class="empty"><strong>المكتبة فارغة</strong>افتح لوحة التحكّم وانشر أول مقال.</div>`
+          : `<div class="empty"><strong>لا مقالات بعد</strong>المحتوى الأول في الطريق — عُد قريبًا.</div>`);
+    return;
+  }
+  grid.style.border = "";
+
+  const rest = [...list];
+  if (filterCat === "الكل" && !searchTerm && rest.length > 2){
+    const p = rest.shift();
+    const el = document.createElement("article");
+    el.className = "featured";
+    el.innerHTML = `
+      <div class="thumb"><img src="${p.image || placeholder(p.title)}" alt="${escapeHtml(p.title)}"></div>
+      <div class="body">
+        <div class="meta" style="margin-bottom:.9rem">
+          <span class="cat">${escapeHtml(p.category||"عام")}</span><i class="dot"></i>
+          <span>${fmtDate(p.createdAt)}</span><i class="dot"></i><span>${readTime(p.content)} دقائق قراءة</span>
+        </div>
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.excerpt || (p.content||"").slice(0,180)+"…")}</p>
+        <span class="btn" style="align-self:flex-start">اقرأ المقال</span>
+      </div>`;
+    el.onclick = () => location.hash = "#/post/" + p.id;
+    feat.appendChild(el);
+  }
+
+  rest.forEach((p,i) => {
+    const el = document.createElement("article");
+    el.className = "card stagger";
+    el.innerHTML = cardHTML(p);
+    el.onclick = () => location.hash = "#/post/" + p.id;
+    grid.appendChild(el);
+    setTimeout(()=>el.classList.add("in"), 40*i);
+  });
+}
+
+/* التصنيفات */
+(function buildChips(){
+  const box = $("#chips");
+  ["الكل", ...CATEGORIES].forEach(c => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = c;
+    b.setAttribute("aria-pressed", c === "الكل");
+    b.onclick = () => {
+      filterCat = c;
+      $$("#chips .chip").forEach(x => x.setAttribute("aria-pressed", x === b));
+      renderList();
+    };
+    box.appendChild(b);
+  });
+  const sel = $("#f-cat");
+  CATEGORIES.forEach(c => { const o = document.createElement("option"); o.value = o.textContent = c; sel.appendChild(o); });
+})();
+$("#q").addEventListener("input", e => { searchTerm = e.target.value; renderList(); });
+
+/* ---------- 6. قارئ المقال + التوجيه ---------- */
+function showReader(id){
+  const p = posts.find(x => x.id === id);
+  if (!p){ $("#articleBody").innerHTML = `<div class="empty"><strong>المقال غير موجود</strong>ربما حُذف أو تغيّر رابطه.</div>`; return; }
+  document.title = p.title + " — ذكاء";
+  $("#articleBody").innerHTML = `
+    <div class="meta">
+      <span class="cat">${escapeHtml(p.category||"عام")}</span><i class="dot"></i>
+      <span>${fmtDate(p.createdAt)}</span><i class="dot"></i>
+      <span>${readTime(p.content)} دقائق قراءة</span><i class="dot"></i>
+      <span>${escapeHtml(p.author || "فريق التحرير")}</span>
+    </div>
+    <h1>${escapeHtml(p.title)}</h1>
+    ${p.excerpt ? `<p style="color:var(--muted);font-size:1.1rem">${escapeHtml(p.excerpt)}</p>` : ""}
+    ${p.image ? `<img class="hero-img" src="${p.image}" alt="${escapeHtml(p.title)}">` : ""}
+    <div class="content">${renderContent(p.content||"")}</div>`;
+}
+function route(){
+  const h = location.hash || "#/";
+  const m = h.match(/^#\/post\/(.+)$/);
+  const admin = h === "#/admin";
+  $("#publicView").classList.toggle("hide", !!m || admin);
+  $("#reader").classList.toggle("hide", !m);
+  $("#adminView").classList.toggle("hide", !(admin && isAdmin));
+  $("#nav").classList.add("closed");
+
+  if (m){ showReader(m[1]); scrollTo(0,0); }
+  else if (admin){
+    if (!isAdmin){ location.hash = "#/"; openLogin(); return; }
+    document.title = "لوحة التحكّم — ذكاء"; scrollTo(0,0);
+  } else {
+    document.title = "ذكاء — منصّة عربية في الذكاء الاصطناعي";
+    const anchor = (!h.startsWith("#/") && h.length > 1) ? document.getElementById(h.slice(1)) : null;
+    if (anchor) setTimeout(() => anchor.scrollIntoView({ behavior:"smooth" }), 40);   // روابط داخلية مثل #articles
+  }
+}
+addEventListener("hashchange", route);
+
+/* ---------- 7. المصادقة ---------- */
+const loginModal = $("#loginModal");
+function openLogin(){ loginModal.classList.remove("hide"); setTimeout(()=>$("#f-email").focus(),50); }
+function closeLogin(){ loginModal.classList.add("hide"); $("#loginMsg").innerHTML = ""; }
+$("#loginBtn").onclick = openLogin;
+$("#closeLogin").onclick = closeLogin;
+loginModal.onclick = e => { if (e.target === loginModal) closeLogin(); };
+addEventListener("keydown", e => { if (e.key === "Escape"){ closeLogin(); $("#confirmModal").classList.add("hide"); } });
+
+$("#loginForm").onsubmit = async e => {
+  e.preventDefault();
+  const btn = $("#doLogin"); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>جارٍ التحقّق';
+  try{
+    await signInWithEmailAndPassword(auth, $("#f-email").value.trim(), $("#f-pass").value);
+    closeLogin(); $("#loginForm").reset();
+    toast("تم تسجيل الدخول", "ok");
+    location.hash = "#/admin";
+  }catch(err){
+    const map = {
+      "auth/invalid-credential":"البريد أو كلمة المرور غير صحيحة.",
+      "auth/invalid-email":"صيغة البريد الإلكتروني غير صحيحة.",
+      "auth/user-not-found":"لا يوجد حساب بهذا البريد.",
+      "auth/wrong-password":"كلمة المرور غير صحيحة.",
+      "auth/too-many-requests":"محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة.",
+      "auth/unauthorized-domain":"هذا النطاق غير مصرّح به في Firebase → Authentication → Settings → Authorized domains."
+    };
+    $("#loginMsg").innerHTML = `<div class="msg err">${map[err.code] || "تعذّر تسجيل الدخول: " + escapeHtml(err.code || err.message)}</div>`;
+  }finally{ btn.disabled = false; btn.textContent = "تسجيل الدخول"; }
+};
+$("#logoutBtn").onclick = async () => { await signOut(auth); location.hash = "#/"; toast("تم تسجيل الخروج"); };
+
+onAuthStateChanged(auth, user => {
+  isAdmin = !!user && (!ADMIN_UID || user.uid === ADMIN_UID);
+  $("#loginBtn").classList.toggle("hide", isAdmin);
+  $("#logoutBtn").classList.toggle("hide", !isAdmin);
+  $("#adminLink").classList.toggle("hide", !isAdmin);
+  $("#adminLink").href = "#/admin";
+  $("#adminWho").textContent = user ? `مسجَّل الدخول باسم ${user.email} · المعرّف ${user.uid}` : "";
+  if (!isAdmin && location.hash === "#/admin") location.hash = "#/";
+  route(); renderAdminList();
+});
+
+/* ---------- 8. قراءة المقالات (مباشرة) ---------- */
+onSnapshot(query(POSTS, orderBy("createdAt","desc")),
+  snap => {
+    posts = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderList(); renderAdminList();
+    const m = (location.hash||"").match(/^#\/post\/(.+)$/);
+    if (m) showReader(m[1]);
+  },
+  err => {
+    $("#grid").innerHTML = "";
+    $("#emptySlot").innerHTML = `<div class="empty"><strong>تعذّر تحميل المقالات</strong>تحقّق من تفعيل Firestore ومن قواعد القراءة العامة. (${escapeHtml(err.code||"")})</div>`;
+    $("#countLabel").textContent = "";
+  }
+);
+
+/* ---------- 9. الصور: ضغط قبل الحفظ ---------- */
+function compress(file, maxW = 1200, q = 0.72){
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        let out = c.toDataURL("image/jpeg", q);
+        let qq = q;
+        while (out.length > 850000 && qq > 0.32){ qq -= 0.1; out = c.toDataURL("image/jpeg", qq); }
+        res(out);
+      };
+      img.onerror = () => rej(new Error("bad image"));
+      img.src = e.target.result;
+    };
+    fr.onerror = () => rej(new Error("read error"));
+    fr.readAsDataURL(file);
+  });
+}
+function setPreview(src){
+  imageData = src || "";
+  $("#preview").innerHTML = src
+    ? `<div class="preview"><img src="${src}" alt="معاينة"><button type="button" id="rmImg" title="إزالة">✕</button></div>` : "";
+  const rm = $("#rmImg"); if (rm) rm.onclick = () => { setPreview(""); $("#f-url").value = ""; $("#f-file").value = ""; };
+}
+const drop = $("#drop");
+drop.onclick = () => $("#f-file").click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = async e => { e.preventDefault(); drop.classList.remove("over"); handleFile(e.dataTransfer.files[0]); };
+$("#f-file").onchange = e => handleFile(e.target.files[0]);
+async function handleFile(file){
+  if (!file || !file.type.startsWith("image/")) return toast("اختر ملف صورة صالحًا", "err");
+  drop.textContent = "جارٍ ضغط الصورة…";
+  try{ setPreview(await compress(file)); toast("جاهزة للنشر", "ok"); }
+  catch{ toast("تعذّرت قراءة الصورة", "err"); }
+  finally{ drop.textContent = "اسحب صورة إلى هنا أو انقر للاختيار — تُضغط تلقائيًا قبل الحفظ"; }
+}
+$("#f-url").oninput = e => { const v = e.target.value.trim(); if (/^https?:\/\//.test(v)) setPreview(v); };
+
+/* ---------- 10. نشر / تعديل / حذف ---------- */
+$("#postForm").onsubmit = async e => {
+  e.preventDefault();
+  if (!isAdmin) return toast("سجّل الدخول أولًا", "err");
+  const btn = $("#saveBtn"); btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>' + (editingId ? "جارٍ الحفظ" : "جارٍ النشر");
+  const data = {
+    title:   $("#f-title").value.trim(),
+    category:$("#f-cat").value,
+    author:  $("#f-author").value.trim() || "فريق التحرير",
+    excerpt: $("#f-excerpt").value.trim(),
+    content: $("#f-content").value.trim(),
+    image:   imageData,
+    updatedAt: serverTimestamp()
+  };
+  try{
+    if (editingId){
+      await updateDoc(doc(db,"posts",editingId), data);
+      toast("حُفظت التعديلات", "ok");
+    }else{
+      data.createdAt = serverTimestamp();
+      await addDoc(POSTS, data);
+      toast("نُشر المقال", "ok");
+    }
+    resetForm();
+  }catch(err){
+    toast(err.code === "permission-denied"
+      ? "الصلاحية مرفوضة: راجع قواعد Firestore و UID المدير."
+      : "تعذّر الحفظ: " + (err.code || err.message), "err");
+  }finally{
+    btn.disabled = false; btn.textContent = editingId ? "حفظ التعديلات" : "نشر المقال";
+  }
+};
+function resetForm(){
+  editingId = null; setPreview("");
+  $("#postForm").reset();
+  $("#editorTitle").textContent = "مقال جديد";
+  $("#saveBtn").textContent = "نشر المقال";
+  $("#cancelEdit").classList.add("hide");
+}
+$("#cancelEdit").onclick = resetForm;
+
+function startEdit(p){
+  editingId = p.id;
+  $("#f-title").value = p.title || "";
+  $("#f-cat").value = p.category || CATEGORIES[0];
+  $("#f-author").value = p.author || "";
+  $("#f-excerpt").value = p.excerpt || "";
+  $("#f-content").value = p.content || "";
+  setPreview(p.image || "");
+  $("#editorTitle").textContent = "تعديل المقال";
+  $("#saveBtn").textContent = "حفظ التعديلات";
+  $("#cancelEdit").classList.remove("hide");
+  scrollTo({ top: 0, behavior: "smooth" });
+}
+let pendingDelete = null;
+function askDelete(p){
+  pendingDelete = p;
+  $("#confirmText").textContent = `سيُحذف «${p.title}» نهائيًا ولا يمكن استرجاعه.`;
+  $("#confirmModal").classList.remove("hide");
+}
+$("#confirmNo").onclick = () => { $("#confirmModal").classList.add("hide"); pendingDelete = null; };
+$("#confirmYes").onclick = async () => {
+  if (!pendingDelete) return;
+  try{ await deleteDoc(doc(db,"posts",pendingDelete.id)); toast("حُذف المقال", "ok"); }
+  catch(err){ toast("تعذّر الحذف: " + (err.code||err.message), "err"); }
+  $("#confirmModal").classList.add("hide"); pendingDelete = null;
+};
+
+function renderAdminList(){
+  const box = $("#adminList"); if (!box) return;
+  $("#adminCount").textContent = posts.length ? `${posts.length} مقالًا` : "";
+  if (!posts.length){ box.innerHTML = `<div class="empty" style="padding:2rem"><strong>لا شيء بعد</strong>أول مقال يبدأ من النموذج المجاور.</div>`; return; }
+  box.innerHTML = "";
+  posts.forEach(p => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `
+      <img src="${p.image || placeholder(p.title)}" alt="">
+      <div class="t"><b>${escapeHtml(p.title)}</b><span>${escapeHtml(p.category||"عام")} · ${fmtDate(p.createdAt)}</span></div>
+      <div class="acts">
+        <button data-a="view">عرض</button>
+        <button data-a="edit">تعديل</button>
+        <button data-a="del" class="del">حذف</button>
+      </div>`;
+    row.querySelector('[data-a="view"]').onclick = () => location.hash = "#/post/" + p.id;
+    row.querySelector('[data-a="edit"]').onclick = () => startEdit(p);
+    row.querySelector('[data-a="del"]').onclick  = () => askDelete(p);
+    box.appendChild(row);
+  });
+}
+
+/* ---------- 11. تفاصيل صغيرة ---------- */
+$("#burger").onclick = () => $("#nav").classList.toggle("closed");
+$("#year").textContent = new Date().getFullYear();
+$$(".yr").forEach(e => e.textContent = new Date().getFullYear());
+route();
+</script>
+</body>
+</html>
